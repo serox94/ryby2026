@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DreamTeam 2026 | La Plaine des Bois 2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #0f1215;
+            --card-bg: #1a1f24;
+            --primary: #2ecc71;
+            --danger: #e74c3c;
+            --accent: #f1c40f;
+            --text: #e0e6ed;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            margin: 0;
+            padding-bottom: 80px;
+            user-select: none;
+        }
+
+        /* Nagłówek z klimatem */
+        header {
+            background: linear-gradient(rgba(15, 18, 21, 0.8), rgba(15, 18, 21, 0.8)), 
+                        url('https://lodgingcarp.com/wp-content/uploads/2020/03/la-plaine-des-bois-etang-2-header.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .countdown {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin-top: 10px;
+        }
+
+        .container { padding: 15px; max-width: 500px; margin: auto; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border: 1px solid #2d343c;
+        }
+
+        h2 { color: var(--primary); margin-top: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+
+        /* Stylizacja Regulaminu */
+        .rules-list { list-style: none; padding: 0; }
+        .rules-list li { margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; }
+        .rule-important { color: var(--danger); font-weight: bold; }
+
+        /* Formularz dodawania ryby */
+        input, select, button {
+            width: 100%; padding: 12px; margin: 8px 0;
+            border-radius: 10px; border: 1px solid #3d444d;
+            background: #252b33; color: white; font-size: 1rem;
+        }
+        button { background: var(--primary); border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+
+        /* Wpisy w dzienniku */
+        .catch-item {
+            background: #252b33; padding: 15px; border-radius: 10px; margin-bottom: 10px;
+            border-left: 5px solid var(--primary);
+        }
+        .catch-header { display: flex; justify-content: space-between; font-weight: bold; }
+        .catch-info { font-size: 0.85rem; color: #9da5b1; margin-top: 5px; }
+
+        /* Nawigacja dolna - Mobile Style */
+        nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: #1a1f24; display: flex; justify-content: space-around;
+            padding: 12px 0; border-top: 1px solid #2d343c; z-index: 1000;
+        }
+        .nav-btn { color: #636e72; text-decoration: none; text-align: center; font-size: 0.7rem; flex: 1; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn i { display: block; font-size: 1.4rem; margin-bottom: 4px; }
+
+        .page { display: none; }
+        .page.active { display: block; animation: slideIn 0.3s ease-out; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 0.8rem; letter-spacing: 2px; color: var(--primary);">DREAM TEAM 2026</div>
+    <div style="font-size: 1.5rem; font-weight: 900;">LA PLAINE DES BOIS 2</div>
+    <div id="timer" class="countdown">Łączenie z satelitą...</div>
+</header>
+
+<div class="container">
+    
+    <div id="page-home" class="page active">
+        <div class="card">
+            <h2><i class="fas fa-gavel"></i> Zasady Stek 2</h2>
+            <ul class="rules-list">
+                <li><i class="fas fa-exclamation-triangle rule-important"></i> <span>Haki <strong>tylko bezdziorowe</strong> (barbless).</span></li>
+                <li><i class="fas fa-times-circle rule-important"></i> <span>Zakaz plecionki jako linki głównej.</span></li>
+                <li><i class="fas fa-check-circle" style="color:var(--primary)"></i> <span>Mata, worek i łódź są na stanowisku.</span></li>
+                <li><i class="fas fa-fish"></i> <span>Tylko świeże kulki (zakaz konserwantów).</span></li>
+                <li><i class="fas fa-home"></i> <span>Domek (Lodge) posiada prąd i taras.</span></li>
+            </ul>
+        </div>
+
+        <div class="card" style="background: linear-gradient(145deg, #1a1f24, #2c3e50);">
+            <h2><i class="fas fa-cloud-sun"></i> Pogoda & Brania</h2>
+            <p style="text-align: center; font-size: 0.9rem;">
+                Termin: <strong>20 - 27 Czerwca</strong><br>
+                Faza: <strong>Księżyc rosnący 🌔</strong><br>
+                <small>Najlepsze brania przewidywane po 23:00</small>
+            </p>
+        </div>
+    </div>
+
+    <div id="page-log" class="page">
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Nowa Ryba</h2>
+            <select id="fisher">
+                <option value="Patryk">Patryk</option>
+                <option value="Maciek">Maciek</option>
+            </select>
+            <input type="text" id="species" placeholder="Gatunek (np. Full Scale)">
+            <input type="number" step="0.1" id="weight" placeholder="Waga (kg)">
+            <input type="text" id="bait" placeholder="Przynęta (np. Orzech Tygrysi)">
+            <button onclick="addFish()"><i class="fas fa-save"></i> ZAPISZ W DZIENNIKU</button>
+        </div>
+        <div id="catch-history"></div>
+    </div>
+
+    <div id="page-gear" class="page">
+        <div class="card">
+            <h2><i class="fas fa-clipboard-list"></i> Checklista</h2>
+            <div id="checklist-items">
+                </div>
+        </div>
+    </div>
+
+</div>
+
+<nav>
+    <a href="#" class="nav-btn active" onclick="nav('home')"><i class="fas fa-dharmachakra"></i>Baza</a>
+    <a href="#" class="nav-btn" onclick="nav('log')"><i class="fas fa-fish-arrow-up"></i>Dziennik</a>
+    <a href="#" class="nav-btn" onclick="nav('gear')"><i class="fas fa-box-open"></i>Sprzęt</a>
+</nav>
+
+<script>
+    // 1. Odliczanie do wyjazdu
+    const targetDate = new Date("June 20, 2026 12:00:00").getTime();
+    function updateTimer() {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById("timer").innerHTML = `DO STARTU: ${d}d ${h}h`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // 2. Nawigacja między stronami
+    function nav(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // 3. Obsługa Dziennika (LocalStorage - dane nie znikną!)
+    function addFish() {
+        const fish = {
+            id: Date.now(),
+            who: document.getElementById('fisher').value,
+            what: document.getElementById('species').value,
+            kg: document.getElementById('weight').value,
+            bait: document.getElementById('bait').value,
+            date: new Date().toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})
+        };
+
+        if(!fish.what || !fish.kg) return alert("Wpisz chociaż gatunek i wagę!");
+
+        let history = JSON.parse(localStorage.getItem('ryby2026_catches') || "[]");
+        history.unshift(fish);
+        localStorage.setItem('ryby2026_catches', JSON.stringify(history));
+        
+        document.getElementById('species').value = '';
+        document.getElementById('weight').value = '';
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('catch-history');
+        const history = JSON.parse(localStorage.getItem('ryby2026_catches') || "[]");
+        container.innerHTML = history.map(f => `
+            <div class="catch-item">
+                <div class="catch-header">
+                    <span>${f.what}</span>
+                    <span style="color:var(--primary)">${f.kg} kg</span>
+                </div>
+                <div class="catch-info">
+                    <i class="fas fa-user"></i> ${f.who} | <i class="fas fa-cookie"></i> ${f.bait} | <i class="fas fa-clock"></i> ${f.date}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 4. Checklista
+    const items = ["Haki bezdziorowe", "Odkażacz", "Zapasowe baterie czołówka", "Klucze do domku", "Powerbank", "Ciepłe skarpety"];
+    document.getElementById('checklist-items').innerHTML = items.map(i => `
+        <div style="padding:10px 0; border-bottom:1px solid #333;">
+            <input type="checkbox" style="width:20px; margin-right:10px;"> ${i}
+        </div>
+    `).join('');
+
+    // Start
+    renderHistory();
+</script>
+
+</body>
+</html>

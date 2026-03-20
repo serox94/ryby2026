@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TACTICAL FISHING V5 | OPERATION STEK 2</title>
+    <title>TACTICAL FISHING V6 | STEK 2 PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,7 +13,7 @@
             --danger: #ff4757;
             --accent: #ffb800;
             --bg-dark: #0a0c0f;
-            --glass: rgba(16, 20, 24, 0.9);
+            --glass: rgba(16, 20, 24, 0.95);
         }
 
         body {
@@ -22,7 +22,6 @@
             min-height: 100vh; overflow-x: hidden;
         }
 
-        /* Tactical Grid Background */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
@@ -30,35 +29,37 @@
         }
 
         header { padding: 30px 20px; text-align: center; }
-        .header-title { font-family: 'Orbitron', sans-serif; font-size: clamp(1.2rem, 4vw, 2.5rem); letter-spacing: 4px; background: linear-gradient(90deg, #fff, var(--neon-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-title { font-family: 'Orbitron', sans-serif; font-size: clamp(1.2rem, 4vw, 2.5rem); letter-spacing: 4px; background: linear-gradient(90deg, #fff, var(--neon-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin:0; }
 
-        .status-bar { background: rgba(0,0,0,0.7); border-y: 1px solid var(--neon-green); padding: 10px; display: flex; justify-content: center; gap: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--neon-green); border-top: 1px solid var(--neon-green); border-bottom: 1px solid var(--neon-green); }
+        .status-bar { background: rgba(0,0,0,0.8); border-top: 1px solid var(--neon-green); border-bottom: 1px solid var(--neon-green); padding: 10px; display: flex; justify-content: center; gap: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--neon-green); }
 
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
 
-        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.05); border-top: 3px solid var(--neon-blue); border-radius: 4px; padding: 20px; transition: 0.3s; }
-        .card:hover { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(0,255,136,0.1); }
-        .card h2 { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--neon-blue); margin-top: 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
+        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.05); border-top: 3px solid var(--neon-blue); border-radius: 4px; padding: 20px; }
+        .card h2 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--neon-blue); margin-top: 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* PB Tracker */
-        .pb-container { margin: 15px 0; background: rgba(0,0,0,0.3); border-radius: 10px; height: 25px; position: relative; overflow: hidden; border: 1px solid #333; }
-        .pb-bar { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-green)); width: 0%; transition: 1s ease-in-out; }
-        .pb-text { position: absolute; width: 100%; text-align: center; font-size: 0.7rem; font-weight: bold; line-height: 25px; color: #fff; text-shadow: 1px 1px 2px #000; }
+        /* PB System */
+        .pb-wrapper { margin-bottom: 20px; }
+        .pb-name { font-size: 0.7rem; color: #aaa; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        .pb-container { background: rgba(0,0,0,0.5); border-radius: 4px; height: 20px; position: relative; overflow: hidden; border: 1px solid #333; }
+        .pb-bar { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-green)); width: 0%; transition: 1s ease; }
+        .pb-text { position: absolute; width: 100%; text-align: center; font-size: 0.65rem; font-weight: bold; line-height: 20px; color: #fff; text-shadow: 1px 1px 2px #000; }
 
-        /* Bait List */
-        .bait-table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
-        .bait-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .bait-qty { color: var(--neon-green); font-weight: bold; text-align: right; }
+        /* Form Elements */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 4px; font-family: 'Inter'; box-sizing: border-box; font-size: 0.9rem; }
+        button { background: var(--neon-green); color: #000; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        button.btn-add { width: auto; padding: 10px 20px; margin: 0; }
+        button.btn-del { background: var(--danger); width: 30px; height: 30px; padding: 0; margin: 0; font-size: 0.7rem; color: white; }
 
-        /* Form & Buttons */
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 4px; font-family: 'Inter'; }
-        button { background: var(--neon-green); color: #000; font-weight: 800; border: none; cursor: pointer; letter-spacing: 1px; }
-        button:active { transform: scale(0.98); }
+        /* History List */
+        .catch-item { background: rgba(255,255,255,0.03); padding: 12px; margin-bottom: 8px; border-left: 3px solid var(--neon-green); display: flex; justify-content: space-between; align-items: center; }
+        .catch-main { font-weight: bold; font-size: 1.1rem; color: var(--accent); }
+        .catch-sub { font-size: 0.7rem; color: #888; margin-top: 3px; }
 
-        .catch-item { background: rgba(255,255,255,0.03); padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border-right: 3px solid var(--neon-blue); }
-
-        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .video-btn { background: #cc0000; color: white; padding: 8px; text-align: center; text-decoration: none; font-size: 0.7rem; border-radius: 4px; font-weight: bold; }
+        /* Inventory */
+        .inv-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .inv-form { display: flex; gap: 5px; margin-bottom: 15px; }
 
         @media (max-width: 600px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
@@ -67,63 +68,72 @@
 
 <header>
     <div class="header-title">OPERATION: STEK 2</div>
-    <div style="color: #888; margin-top: 5px; letter-spacing: 2px; font-size: 0.8rem;">RECONNAISSANCE & LOGISTICS SYSTEM</div>
+    <div style="color: #666; font-size: 0.7rem; letter-spacing: 2px;">LA PLAINE DES BOIS 2 | PRO-DASHBOARD V6</div>
 </header>
 
 <div class="status-bar">
-    <span><i class="fas fa-satellite"></i> SIGNAL: SECURE</span>
     <span id="countdown">T-MINUS: --D --H</span>
+    <span><i class="fas fa-wifi"></i> SYSTEM LIVE</span>
 </div>
 
 <div class="dashboard">
     <div class="card" style="border-top-color: var(--neon-green);">
-        <h2><i class="fas fa-plus-square"></i> Log Połowu</h2>
+        <h2><i class="fas fa-fish"></i> Rejestracja Operacji</h2>
         <select id="fisher">
             <option value="Patryk">OPERATOR: PATRYK</option>
             <option value="Maciek">OPERATOR: MACIEK</option>
         </select>
-        <input type="text" id="species" placeholder="Gatunek (np. Mirror)">
-        <input type="number" step="0.1" id="weight" placeholder="Waga (kg)">
-        <button onclick="addFish()">LOGUJ DANE</button>
-        
-        <div id="catch-history" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+        <div class="form-row">
+            <input type="text" id="species" placeholder="Gatunek">
+            <input type="number" step="0.1" id="weight" placeholder="Waga (kg)">
+        </div>
+        <div class="form-row">
+            <input type="text" id="bait" placeholder="Smak kulki / Przynęta">
+            <input type="number" id="spot" placeholder="Punkt wywozu (#)">
+        </div>
+        <button onclick="addFish()">LOGUJ POŁÓW</button>
+
+        <div id="catch-history" style="margin-top: 20px; max-height: 300px; overflow-y: auto;"></div>
     </div>
 
     <div class="card">
-        <h2><i class="fas fa-crosshairs"></i> Cele Operacyjne</h2>
-        <div style="font-size: 0.8rem; margin-bottom: 5px;">TARGET PB: <span style="color:var(--accent)">25.0 KG</span></div>
-        <div class="pb-container">
-            <div class="pb-bar" id="pb-progress"></div>
-            <div class="pb-text" id="pb-label">0% DO CELU</div>
+        <h2><i class="fas fa-crosshairs"></i> Cele PB (TARGET: 20kg)</h2>
+        
+        <div class="pb-wrapper">
+            <div class="pb-name">Patryk</div>
+            <div class="pb-container">
+                <div class="pb-bar" id="pb-patryk"></div>
+                <div class="pb-text" id="txt-patryk">0.0 KG / 0%</div>
+            </div>
         </div>
-        <div style="font-size: 0.75rem; color: #888;">
-            <p><i class="fas fa-info-circle"></i> Statystyka: Największa ryba aktualizuje pasek postępu.</p>
+
+        <div class="pb-wrapper">
+            <div class="pb-name">Maciek</div>
+            <div class="pb-container">
+                <div class="pb-bar" id="pb-maciek"></div>
+                <div class="pb-text" id="txt-maciek">0.0 KG / 0%</div>
+            </div>
         </div>
-        <hr style="border:0; border-top:1px solid #333;">
-        <h3><i class="fas fa-map-marked-alt"></i> Sektor Recon</h3>
-        <p style="font-size: 0.8rem;">Lokalizacja: <strong>Północny Brzeg - Stek 2</strong></p>
-        <div class="video-grid">
-            <a href="https://www.youtube.com/results?search_query=lodgingcarp+la+plaine+des+bois+2" target="_blank" class="video-btn"><i class="fab fa-youtube"></i> FILMY</a>
-            <a href="https://lodgingcarp.com/en/destination/" target="_blank" class="video-btn" style="background:var(--neon-blue); color:#000;"><i class="fas fa-map"></i> MAPA</a>
+
+        <div style="font-size: 0.7rem; color: #666; border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">
+            <i class="fas fa-map-marker-alt"></i> Lokalizacja: Stek 2 (Francja)<br>
+            <i class="fas fa-info-circle"></i> Tylko haki bezdziorowe!
         </div>
     </div>
 
     <div class="card" style="border-top-color: var(--accent);">
-        <h2><i class="fas fa-boxes"></i> Inwentarz Zanęty</h2>
-        <table class="bait-table">
-            <tr><td>Kulki Fresh (Patryk)</td><td class="bait-qty">15 kg</td></tr>
-            <tr><td>Kulki Fresh (Maciek)</td><td class="bait-qty">15 kg</td></tr>
-            <tr><td>Orzech Tygrysi</td><td class="bait-qty">5 kg</td></tr>
-            <tr><td>Pellet Carp</td><td class="bait-qty">10 kg</td></tr>
-        </table>
-        <p style="font-size: 0.7rem; color: var(--danger); margin-top: 10px;">
-            *PAMIĘTAJ: Tylko kulki świeże (bez konserwantów)!
-        </p>
+        <h2><i class="fas fa-boxes"></i> Inwentarz Taktyczny</h2>
+        <div class="inv-form">
+            <input type="text" id="inv-name" placeholder="Przedmiot">
+            <input type="text" id="inv-qty" placeholder="Ilość" style="width: 80px;">
+            <button class="btn-add" onclick="addInv()">+</button>
+        </div>
+        <div id="inv-list"></div>
     </div>
 </div>
 
 <script>
-    const targetWeight = 25.0; // TWOJE PB DO POBICIA
+    const TARGET_PB = 20.0;
 
     // Countdown
     const tripDate = new Date("June 20, 2026 12:00:00").getTime();
@@ -139,41 +149,80 @@
     // Fish Logic
     function addFish() {
         const fish = {
+            id: Date.now(),
             who: document.getElementById('fisher').value,
             what: document.getElementById('species').value || 'Karp',
             kg: parseFloat(document.getElementById('weight').value),
-            date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            bait: document.getElementById('bait').value || '-',
+            spot: document.getElementById('spot').value || '?',
+            fullDate: new Date().toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})
         };
         if(isNaN(fish.kg)) return alert("Podaj wagę!");
 
-        let catches = JSON.parse(localStorage.getItem('fishing_tactical_v5') || "[]");
+        let catches = JSON.parse(localStorage.getItem('ryby_v6_data') || "[]");
         catches.unshift(fish);
-        localStorage.setItem('fishing_tactical_v5', JSON.stringify(catches));
+        localStorage.setItem('ryby_v6_data', JSON.stringify(catches));
         
         document.getElementById('weight').value = '';
-        renderData();
+        renderAll();
     }
 
-    function renderData() {
-        const catches = JSON.parse(localStorage.getItem('fishing_tactical_v5') || "[]");
-        
+    // Inventory Logic
+    function addInv() {
+        const name = document.getElementById('inv-name').value;
+        const qty = document.getElementById('inv-qty').value;
+        if(!name) return;
+        let inv = JSON.parse(localStorage.getItem('ryby_v6_inv') || "[]");
+        inv.push({id: Date.now(), name, qty});
+        localStorage.setItem('ryby_v6_inv', JSON.stringify(inv));
+        document.getElementById('inv-name').value = '';
+        document.getElementById('inv-qty').value = '';
+        renderAll();
+    }
+
+    function delInv(id) {
+        let inv = JSON.parse(localStorage.getItem('ryby_v6_inv') || "[]");
+        inv = inv.filter(item => item.id !== id);
+        localStorage.setItem('ryby_v6_inv', JSON.stringify(inv));
+        renderAll();
+    }
+
+    function renderAll() {
         // Render History
+        const catches = JSON.parse(localStorage.getItem('ryby_v6_data') || "[]");
         document.getElementById('catch-history').innerHTML = catches.map(f => `
             <div class="catch-item">
-                <div><strong>${f.kg}kg</strong> <span style="font-size:0.7rem; color:#888;">${f.who}</span></div>
-                <div style="font-size:0.8rem; color:var(--neon-blue);">${f.date}</div>
+                <div>
+                    <div class="catch-main">${f.kg} KG</div>
+                    <div class="catch-sub">${f.who} | ${f.what}</div>
+                    <div class="catch-sub">Przynęta: ${f.bait} | Spot: #${f.spot}</div>
+                </div>
+                <div style="text-align:right; font-size:0.65rem; color:#666;">${f.fullDate}</div>
             </div>
         `).join('');
 
-        // PB Tracker
-        if(catches.length > 0) {
-            const maxFish = Math.max(...catches.map(f => f.kg));
-            const percent = Math.min((maxFish / targetWeight) * 100, 100).toFixed(1);
-            document.getElementById('pb-progress').style.width = percent + '%';
-            document.getElementById('pb-label').innerHTML = `${maxFish} KG / ${percent}% CELU`;
-        }
+        // Update PB bars
+        const updatePB = (name, barId, txtId) => {
+            const userFish = catches.filter(f => f.who === name).map(f => f.kg);
+            const max = userFish.length > 0 ? Math.max(...userFish) : 0;
+            const pct = Math.min((max / TARGET_PB) * 100, 100).toFixed(1);
+            document.getElementById(barId).style.width = pct + '%';
+            document.getElementById(txtId).innerHTML = `${max.toFixed(1)} KG / ${pct}%`;
+        };
+        updatePB('Patryk', 'pb-patryk', 'txt-patryk');
+        updatePB('Maciek', 'pb-maciek', 'txt-maciek');
+
+        // Render Inventory
+        const inv = JSON.parse(localStorage.getItem('ryby_v6_inv') || "[]");
+        document.getElementById('inv-list').innerHTML = inv.map(i => `
+            <div class="inv-item">
+                <span>${i.name} <small style="color:var(--neon-green)">(${i.qty})</small></span>
+                <button class="btn-del" onclick="delInv(${i.id})">X</button>
+            </div>
+        `).join('');
     }
-    renderData();
+
+    renderAll();
 </script>
 
 </body>

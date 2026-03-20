@@ -3,246 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TACTICAL V9 | STEK 2 COMMAND</title>
+    <title>TACTICAL V10 | STEK 2 COMMAND</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --neon-green: #00ff88; --neon-blue: #00d2ff; --danger: #ff4757;
-            --accent: #ffb800; --bg-dark: #0a0c0f; --glass: rgba(16, 20, 24, 0.96);
+            --neon-green: #00ff88;
+            --neon-blue: #00d2ff;
+            --danger: #ff4757;
+            --accent: #ffb800;
+            --bg-dark: #0a0c0f;
+            --glass: rgba(16, 20, 24, 0.96);
         }
+
         body {
-            margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: #fff;
-            background-image: radial-gradient(circle at 10% 20%, rgba(0, 255, 136, 0.03) 0%, transparent 40%);
-            min-height: 100vh; padding-bottom: 50px;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            background-image: radial-gradient(circle at 10% 20%, rgba(0,255,136,0.04) 0%, transparent 40%);
+            min-height: 100vh;
+            padding-bottom: 50px;
         }
-        header { padding: 25px; text-align: center; border-bottom: 1px solid var(--neon-green); background: rgba(0,0,0,0.5); }
-        .header-title { font-family: 'Orbitron'; font-size: 1.8rem; letter-spacing: 3px; background: linear-gradient(90deg, #fff, var(--neon-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
-        
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; padding: 20px; max-width: 1600px; margin: auto; }
-        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.05); border-top: 3px solid var(--neon-blue); border-radius: 4px; padding: 20px; height: fit-content; }
-        h2 { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon-blue); margin-top: 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
 
-        .weather-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 4px; text-align: center; margin-bottom: 15px; border: 1px solid #222; }
-        .address-box { font-size: 0.8rem; color: #aaa; line-height: 1.6; }
-        .address-box strong { color: var(--neon-green); }
+        header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid var(--neon-green);
+            background: rgba(0,0,0,0.5);
+        }
 
-        .pb-wrapper { margin-bottom: 20px; }
-        .pb-header { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 800; margin-bottom: 4px; }
-        .pb-container { background: rgba(0,0,0,0.5); border-radius: 3px; height: 18px; position: relative; overflow: hidden; border: 1px solid #333; }
-        .pb-bar { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-green)); width: 0%; transition: 1s ease; }
-        .pb-text { position: absolute; width: 100%; text-align: center; font-size: 0.65rem; line-height: 18px; font-weight: 900; color: #fff; }
+        .header-title {
+            font-family: 'Orbitron';
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #fff, var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: 3px;
+        }
 
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        input, select, button { width: 100%; padding: 10px; margin: 4px 0; background: rgba(0,0,0,0.3); border: 1px solid #333; color: #fff; border-radius: 4px; font-family: 'Inter'; font-size: 0.85rem; box-sizing: border-box; }
-        button { background: var(--neon-green); color: #000; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; }
-        
-        .check-container { margin-top: 10px; }
-        .check-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); padding: 8px; margin-bottom: 4px; border-radius: 3px; font-size: 0.85rem; }
-        .check-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; margin: 0; }
-        .btn-del { background: var(--danger); width: 25px; height: 25px; padding: 0; font-size: 0.7rem; color: white; margin-left: auto; }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: auto;
+        }
 
-        #map-display { width: 100%; min-height: 150px; border: 2px dashed #333; margin-top: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #map-display img { width: 100%; height: auto; }
+        .card {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 3px solid var(--neon-blue);
+            border-radius: 4px;
+            padding: 20px;
+        }
 
-        .catch-log-item { background: rgba(255,255,255,0.02); padding: 10px; margin-bottom: 5px; border-left: 3px solid var(--neon-green); font-size: 0.8rem; }
-        .status-bar { background: rgba(0,0,0,0.8); border-top: 1px solid var(--neon-green); border-bottom: 1px solid var(--neon-green); padding: 10px; display: flex; justify-content: center; gap: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--neon-green); }
+        h2 {
+            font-family: 'Orbitron';
+            font-size: 1rem;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0;
+        }
+
+        .weather-box {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .pb-container {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            border-radius: 3px;
+            height: 18px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pb-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            width: 0%;
+            transition: 1s ease;
+        }
+
+        .pb-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+            line-height: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            margin: 4px 0;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        button {
+            background: var(--neon-green);
+            border: none;
+            cursor: pointer;
+            color: black;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 4px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 3px;
+        }
+
+        .btn-del {
+            margin-left: auto;
+            background: var(--danger);
+            width: 25px;
+            height: 25px;
+            border: none;
+            color: white;
+        }
+
+        #map-display img {
+            width: 100%;
+        }
+
+        .tools {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-bar {
+            background: rgba(0,0,0,0.7);
+            font-family: 'Orbitron';
+            border-bottom: 1px solid var(--neon-green);
+            padding: 10px;
+            text-align: center;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
+
 <body>
 
 <header>
-    <div class="header-title">OPERATION: STEK 2</div>
-    <div style="font-size: 0.7rem; color: var(--neon-green); font-family: 'Orbitron';">COULLONS, FRANCE | V9 ULTIMATE</div>
+    <div class="header-title">OPERATION: STEK 2 - V10</div>
+    <div style="font-size: 0.75rem; color: var(--neon-green); font-family:Orbitron;">
+        COULLONS, FRANCE | ULTIMATE TACTICAL PANEL
+    </div>
 </header>
 
 <div class="status-bar">
     <span id="countdown">T-MINUS: --D --H</span>
-    <span><i class="fas fa-satellite"></i> LIVE WEATHER ACTIVE</span>
 </div>
 
 <div class="dashboard">
 
+    <!-- POGODA -->
     <div class="card" style="border-top-color: var(--accent);">
         <h2><i class="fas fa-cloud-sun"></i> Pogoda Coullons</h2>
-        <div class="weather-box" id="weather-info">Pobieranie danych...</div>
-        <div class="address-box">
-            <strong>STEK 2:</strong> Route de Cerdon, Coullons<br>
-            <strong>SKLEP:</strong> Intermarché, Rte de Gien<br>
-        </div>
-        <button onclick="window.open('https://www.google.com/maps/dir//45720+Coullons,+Francja/')" style="margin-top:10px; background: var(--neon-blue);">
-            NAWIGACJA <i class="fas fa-map-marked-alt"></i>
-        </button>
+        <div id="weather-info" class="weather-box">Pobieranie...</div>
     </div>
 
+    <!-- POŁOWY -->
     <div class="card">
-        <h2><i class="fas fa-chart-bar"></i> Wyniki (Cel: 20kg)</h2>
-        <div class="pb-wrapper">
-            <div class="pb-header"><span>PATRYK</span><span id="sum-patryk" style="color:var(--neon-green)">0 kg</span></div>
-            <div class="pb-container"><div class="pb-bar" id="pb-patryk"></div><div class="pb-text" id="txt-patryk">0 kg / 0%</div></div>
+        <h2><i class="fas fa-fish"></i> Wyniki (Cel: 20 kg)</h2>
+
+        <div>
+            <b>Patryk</b>
+            <span id="sum-patryk" style="float:right;color:var(--neon-green)">0 kg</span>
+            <div class="pb-container"><div class="pb-bar" id="pb-patryk"></div><div class="pb-text" id="txt-patryk"></div></div>
         </div>
-        <div class="pb-wrapper">
-            <div class="pb-header"><span>MACIEK</span><span id="sum-maciek" style="color:var(--neon-green)">0 kg</span></div>
-            <div class="pb-container"><div class="pb-bar" id="pb-maciek"></div><div class="pb-text" id="txt-maciek">0 kg / 0%</div></div>
+
+        <div style="margin-top:10px;">
+            <b>Maciek</b>
+            <span id="sum-maciek" style="float:right;color:var(--neon-green)">0 kg</span>
+            <div class="pb-container"><div class="pb-bar" id="pb-maciek"></div><div class="pb-text" id="txt-maciek"></div></div>
         </div>
-        
-        <h2><i class="fas fa-plus-circle"></i> Loguj Połów</h2>
-        <select id="fisher"><option value="Patryk">Patryk</option><option value="Maciek">Maciek</option></select>
+
+        <h2 style="margin-top:20px;"><i class="fas fa-plus-circle"></i> Loguj Połów</h2>
+
+        <select id="fisher">
+            <option value="Patryk">Patryk</option>
+            <option value="Maciek">Maciek</option>
+        </select>
+
         <div class="form-row">
-            <input type="text" id="spec" placeholder="Gatunek">
-            <input type="number" step="0.1" id="wgt" placeholder="Waga kg">
+            <input id="spec" placeholder="Gatunek">
+            <input id="wgt" type="number" step="0.1" placeholder="Waga (kg)">
         </div>
+
         <div class="form-row">
-            <input type="text" id="bait" placeholder="Smak/Przynęta">
-            <input type="number" id="spot" placeholder="Spot #">
+            <input id="bait" placeholder="Przynęta">
+            <input id="spot" type="number" placeholder="Spot #">
         </div>
-        <button onclick="addFish()">Zapisz Połów</button>
-        <div id="catch-list" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+
+        <button onclick="addFish()">Zapisz połów</button>
+
+        <div id="catch-list" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+
+        <!-- BACKUP -->
+        <div class="tools">
+            <button onclick="exportData()" style="background:var(--neon-blue);color:black;">EXPORT</button>
+            <button onclick="importData()" style="background:var(--accent);color:black;">IMPORT</button>
+        </div>
+        <input type="file" id="import-file" style="display:none">
     </div>
 
+    <!-- LISTY -->
     <div class="card" style="border-top-color: var(--neon-green);">
-        <h2><i class="fas fa-list-ul"></i> Planowanie Listy</h2>
+        <h2><i class="fas fa-list-ul"></i> Listy</h2>
         <select id="check-selector" onchange="renderChecklists()">
-            <option value="pack">Lista: Pakowanie Sprzętu</option>
-            <option value="shop">Lista: Zakupy (Chemia/Wędkarskie)</option>
-            <option value="food">Lista: Jedzenie / Picie</option>
+            <option value="pack">Pakowanie</option>
+            <option value="shop">Zakupy</option>
+            <option value="food">Jedzenie</option>
         </select>
-        <div style="display:flex; gap:5px; margin-top:10px;">
-            <input type="text" id="new-item" placeholder="Nowa pozycja...">
+        <div style="display:flex;gap:8px;margin-top:10px;">
+            <input id="new-item" placeholder="Nowa pozycja...">
             <button onclick="addItem()" style="width:50px;">+</button>
         </div>
-        <div id="check-list-container" class="check-container"></div>
+
+        <div id="check-list-container" style="margin-top:10px;"></div>
     </div>
 
+    <!-- MAPA -->
     <div class="card">
-        <h2><i class="fas fa-crosshairs"></i> Recon (Mapa Dna)</h2>
-        <input type="file" id="map-upload" accept="image/*" style="font-size: 0.7rem;">
-        <div id="map-display">Brak wgranej mapy</div>
+        <h2><i class="fas fa-map"></i> Mapa Dna</h2>
+        <input type="file" id="map-upload" accept="image/*">
+        <div id="map-display" style="margin-top:10px; min-height:150px; border:1px dashed #333; display:flex; justify-content:center; align-items:center;">
+            Brak mapy
+        </div>
     </div>
 
 </div>
 
 <script>
-    const TARGET_PB = 20.0;
-    const WEATHER_API_KEY = 'fd3ff3668ce17f7d6ffe3073a1fb8a68';
-    const CITY = 'Coullons,FR';
+    const TARGET = 20;
 
-    // Countdown
+    // COUNTDOWN
     const tripDate = new Date("June 20, 2026 12:00:00").getTime();
     setInterval(() => {
-        const diff = tripDate - new Date().getTime();
+        const diff = tripDate - Date.now();
         const d = Math.floor(diff / 86400000);
         const h = Math.floor((diff % 86400000) / 3600000);
-        document.getElementById("countdown").innerHTML = `T-MINUS: ${d}D ${h}H`;
+        document.getElementById("countdown").innerText = `T-MINUS: ${d}D ${h}H`;
     }, 1000);
 
-    // Weather
+    // WEATHER
     async function fetchWeather() {
         try {
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${WEATHER_API_KEY}&units=metric&lang=pl`);
-            const data = await res.json();
-            document.getElementById('weather-info').innerHTML = `
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--neon-blue);">${data.main.temp}°C</div>
-                <div style="text-transform: capitalize;">${data.weather[0].description}</div>
-                <div style="font-size: 0.7rem; color:#888; margin-top:5px;">P: ${data.main.pressure} hPa | W: ${data.wind.speed} m/s</div>
+            const key = "fd3ff3668ce17f7d6ffe3073a1fb8a68";
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Coullons,FR&appid=${key}&units=metric&lang=pl`);
+            const d = await res.json();
+
+            document.getElementById("weather-info").innerHTML = `
+                <div style="font-size:1.7rem;color:var(--neon-blue);font-weight:bold;">${d.main.temp}°C</div>
+                <div style="text-transform:capitalize;">${d.weather[0].description}</div>
+                <div style="font-size:0.75rem;margin-top:5px;">P: ${d.main.pressure} hPa | W: ${d.wind.speed} m/s</div>
             `;
-        } catch (e) { document.getElementById('weather-info').innerHTML = "Błąd API"; }
+        } catch {
+            document.getElementById("weather-info").innerText = "Błąd API";
+        }
     }
     fetchWeather();
 
-    // Ryby
+    // FISH
     function addFish() {
+        const kg = parseFloat(wgt.value);
+        if (isNaN(kg) || kg <= 0) return;
+
         const fish = {
             id: Date.now(),
-            who: document.getElementById('fisher').value,
-            what: document.getElementById('spec').value || 'Karp',
-            kg: parseFloat(document.getElementById('wgt').value),
-            bait: document.getElementById('bait').value || '-',
-            spot: document.getElementById('spot').value || '?',
-            date: new Date().toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})
+            who: fisher.value,
+            what: spec.value || "Karp",
+            kg: kg,
+            bait: bait.value || "-",
+            spot: spot.value || "?",
+            date: new Date().toLocaleString("pl-PL")
         };
-        if(isNaN(fish.kg)) return;
-        let data = JSON.parse(localStorage.getItem('v9_catches') || "[]");
-        data.unshift(fish);
-        localStorage.setItem('v9_catches', JSON.stringify(data));
-        document.getElementById('wgt').value = '';
+
+        let list = JSON.parse(localStorage.getItem("v10_catches") || "[]");
+        list.unshift(fish);
+        localStorage.setItem("v10_catches", JSON.stringify(list));
+
+        spec.value = "";
+        wgt.value = "";
+        bait.value = "";
+        spot.value = "";
+
         renderAll();
     }
 
-    // Listy
+    function renderAll() {
+        const list = JSON.parse(localStorage.getItem("v10_catches") || "[]");
+
+        // LOGI
+        catch-list.innerHTML = list.map(f => `
+            <div style="background:rgba(255,255,255,0.03);padding:8px;margin-bottom:5px;border-left:3px solid var(--neon-green);">
+                <b>${f.kg} kg</b> | ${f.who} | ${f.what}<br>
+                <small>${f.bait} | Spot #${f.spot} | ${f.date}</small>
+            </div>
+        `).join("");
+
+        // STATY
+        const calc = (name) => {
+            const fish = list.filter(f => f.who === name);
+            const total = fish.reduce((a,b) => a + b.kg, 0);
+            const pct = Math.min((total / TARGET) * 100, 100);
+
+            return { total, pct };
+        };
+
+        const p = calc("Patryk");
+        const m = calc("Maciek");
+
+        document.getElementById("sum-patryk").innerText = `${p.total.toFixed(1)} kg`;
+        document.getElementById("sum-maciek").innerText = `${m.total.toFixed(1)} kg`;
+
+        pb-patryk.style.width = p.pct + "%";
+        pb-maciek.style.width = m.pct + "%";
+
+        txt-patryk.innerText = `${p.total.toFixed(1)} kg (${p.pct.toFixed(1)}%)`;
+        txt-maciek.innerText = `${m.total.toFixed(1)} kg (${m.pct.toFixed(1)}%)`;
+    }
+
+    // LISTY
+    function loadChecks() {
+        return JSON.parse(localStorage.getItem("v10_checks") || '{"pack":[],"shop":[],"food":[]}');
+    }
+
+    function saveChecks(obj) {
+        localStorage.setItem("v10_checks", JSON.stringify(obj));
+    }
+
     function addItem() {
-        const type = document.getElementById('check-selector').value;
-        const text = document.getElementById('new-item').value;
-        if(!text) return;
-        let checks = JSON.parse(localStorage.getItem('v9_checks') || '{"pack":[],"shop":[],"food":[]}');
-        checks[type].push({id: Date.now(), text, done: false});
-        localStorage.setItem('v9_checks', JSON.stringify(checks));
-        document.getElementById('new-item').value = '';
+        const val = new-item.value.trim();
+        if (!val) return;
+
+        let data = loadChecks();
+        const type = check-selector.value;
+
+        data[type].push({ id: Date.now(), text: val, done: false });
+        saveChecks(data);
+
+        new-item.value = "";
         renderChecklists();
     }
 
     function toggleCheck(type, id) {
-        let checks = JSON.parse(localStorage.getItem('v9_checks'));
-        let item = checks[type].find(i => i.id === id);
+        let data = loadChecks();
+        let item = data[type].find(i => i.id === id);
         item.done = !item.done;
-        localStorage.setItem('v9_checks', JSON.stringify(checks));
+        saveChecks(data);
         renderChecklists();
     }
 
-    function delCheck(type, id) {
-        let checks = JSON.parse(localStorage.getItem('v9_checks'));
-        checks[type] = checks[type].filter(i => i.id !== id);
-        localStorage.setItem('v9_checks', JSON.stringify(checks));
+    function deleteCheck(type, id) {
+        let data = loadChecks();
+        data[type] = data[type].filter(i => i.id !== id);
+        saveChecks(data);
         renderChecklists();
     }
 
-    // Mapa
-    document.getElementById('map-upload').addEventListener('change', function(e) {
+    function renderChecklists() {
+        const type = check-selector.value;
+        const data = loadChecks()[type];
+
+        check-list-container.innerHTML = data.map(i => `
+            <div class="check-item">
+                <input type="checkbox" ${i.done ? "checked" : ""} onclick="toggleCheck('${type}', ${i.id})">
+                <span style="${i.done ? "text-decoration:line-through;opacity:0.5" : ""}">${i.text}</span>
+                <button class="btn-del" onclick="deleteCheck('${type}', ${i.id})">X</button>
+            </div>
+        `).join("");
+    }
+
+    // MAPA
+    map-upload.addEventListener("change", e => {
         const reader = new FileReader();
-        reader.onload = function() { localStorage.setItem('v9_map', reader.result); renderMap(); }
+        reader.onload = () => {
+            localStorage.setItem("v10_map", reader.result);
+            renderMap();
+        };
         reader.readAsDataURL(e.target.files[0]);
     });
 
     function renderMap() {
-        const img = localStorage.getItem('v9_map');
-        if(img) document.getElementById('map-display').innerHTML = `<img src="${img}">`;
+        const map = localStorage.getItem("v10_map");
+        map-display.innerHTML = map
+            ? `<img src="${map}">`
+            : "Brak mapy";
     }
 
-    function renderAll() {
-        const catches = JSON.parse(localStorage.getItem('v9_catches') || "[]");
-        document.getElementById('catch-list').innerHTML = catches.map(f => `
-            <div class="catch-log-item">
-                <strong>${f.kg}kg</strong> | ${f.who} | ${f.what}<br>
-                <small>${f.bait} | Spot #${f.spot} | ${f.date}</small>
-            </div>
-        `).join('');
-
-        const updateStats = (name, barId, txtId, sumId) => {
-            const userFish = catches.filter(f => f.who === name).map(f => f.kg);
-            const max = userFish.length > 0 ? Math.max(...userFish) : 0;
-            const total = userFish.reduce((a, b) => a + b, 0);
-            const pct = Math.min((max / TARGET_PB) * 100, 100).toFixed(1);
-            document.getElementById(barId).style.width = pct + '%';
-            document.getElementById(txtId).innerHTML = `${max.toFixed(1)}kg / ${pct}%`;
-            document.getElementById(sumId).innerHTML = `SUMA: ${total.toFixed(1)} kg`;
+    // BACKUP
+    function exportData() {
+        const data = {
+            catches: JSON.parse(localStorage.getItem("v10_catches") || "[]"),
+            checks: JSON.parse(localStorage.getItem("v10_checks") || "{}"),
+            map: localStorage.getItem("v10_map") || null
         };
-        updateStats('Patryk', 'pb-patryk', 'txt-patryk', 'sum-patryk');
-        updateStats('Maciek', 'pb-maciek', 'txt-maciek', 'sum-maciek');
+
+        const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "backup_v10.json";
+        a.click();
     }
 
-    function renderChecklists() {
-        const type = document.getElementById('check-selector').value;
-        const checks = JSON.parse(localStorage.getItem('v9_checks') || '{"pack":[],"shop":[],"food":[]}');
-        document.getElementById('check-list-container').innerHTML = checks[type].map(i => `
-            <div class="check-item">
-                <input type="checkbox" ${i.done ? 'checked' : ''} onclick="toggleCheck('${type}', ${i.id})">
-                <span style="${i.done ? 'text-decoration: line-through; opacity: 0.5' : ''}">${i.text}</span>
-                <button class="btn-del" onclick="delCheck('${type}', ${i.id})">X</button>
-            </div>
-        `).join('');
+    function importData() {
+        import-file.click();
     }
 
-    renderAll(); renderChecklists(); renderMap();
+    import-file.addEventListener("change", async e => {
+        const file = e.target.files[0];
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        localStorage.setItem("v10_catches", JSON.stringify(data.catches || []));
+        localStorage.setItem("v10_checks", JSON.stringify(data.checks || {}));
+        if (data.map) localStorage.setItem("v10_map", data.map);
+
+        renderAll();
+        renderChecklists();
+        renderMap();
+    });
+
+    // LOAD EVERYTHING
+    renderAll();
+    renderChecklists();
+    renderMap();
 </script>
 
 </body>

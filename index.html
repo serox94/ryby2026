@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TACTICAL FISHING V6 | STEK 2 PRO</title>
+    <title>TACTICAL FISHING V7 | PRO-ANALYTICS</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -39,11 +39,13 @@
         .card h2 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--neon-blue); margin-top: 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
         /* PB System */
-        .pb-wrapper { margin-bottom: 20px; }
-        .pb-name { font-size: 0.7rem; color: #aaa; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
-        .pb-container { background: rgba(0,0,0,0.5); border-radius: 4px; height: 20px; position: relative; overflow: hidden; border: 1px solid #333; }
+        .pb-wrapper { margin-bottom: 25px; }
+        .pb-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
+        .pb-name { font-size: 0.75rem; color: #fff; font-weight: 800; text-transform: uppercase; }
+        .pb-total { font-size: 0.7rem; color: var(--neon-green); font-family: 'Orbitron'; }
+        .pb-container { background: rgba(0,0,0,0.5); border-radius: 4px; height: 22px; position: relative; overflow: hidden; border: 1px solid #333; }
         .pb-bar { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-green)); width: 0%; transition: 1s ease; }
-        .pb-text { position: absolute; width: 100%; text-align: center; font-size: 0.65rem; font-weight: bold; line-height: 20px; color: #fff; text-shadow: 1px 1px 2px #000; }
+        .pb-text { position: absolute; width: 100%; text-align: center; font-size: 0.7rem; font-weight: 900; line-height: 22px; color: #fff; text-shadow: 1px 1px 2px #000; }
 
         /* Form Elements */
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -68,17 +70,17 @@
 
 <header>
     <div class="header-title">OPERATION: STEK 2</div>
-    <div style="color: #666; font-size: 0.7rem; letter-spacing: 2px;">LA PLAINE DES BOIS 2 | PRO-DASHBOARD V6</div>
+    <div style="color: #666; font-size: 0.7rem; letter-spacing: 2px;">PRO-ANALYTICS DASHBOARD V7</div>
 </header>
 
 <div class="status-bar">
     <span id="countdown">T-MINUS: --D --H</span>
-    <span><i class="fas fa-wifi"></i> SYSTEM LIVE</span>
+    <span><i class="fas fa-microchip"></i> ANALYTICS ACTIVE</span>
 </div>
 
 <div class="dashboard">
     <div class="card" style="border-top-color: var(--neon-green);">
-        <h2><i class="fas fa-fish"></i> Rejestracja Operacji</h2>
+        <h2><i class="fas fa-plus-square"></i> Rejestracja Danych</h2>
         <select id="fisher">
             <option value="Patryk">OPERATOR: PATRYK</option>
             <option value="Maciek">OPERATOR: MACIEK</option>
@@ -88,36 +90,41 @@
             <input type="number" step="0.1" id="weight" placeholder="Waga (kg)">
         </div>
         <div class="form-row">
-            <input type="text" id="bait" placeholder="Smak kulki / Przynęta">
-            <input type="number" id="spot" placeholder="Punkt wywozu (#)">
+            <input type="text" id="bait" placeholder="Przynęta">
+            <input type="number" id="spot" placeholder="Spot (#)">
         </div>
         <button onclick="addFish()">LOGUJ POŁÓW</button>
-
-        <div id="catch-history" style="margin-top: 20px; max-height: 300px; overflow-y: auto;"></div>
+        <div id="catch-history" style="margin-top: 20px; max-height: 350px; overflow-y: auto;"></div>
     </div>
 
     <div class="card">
-        <h2><i class="fas fa-crosshairs"></i> Cele PB (TARGET: 20kg)</h2>
+        <h2><i class="fas fa-chart-bar"></i> Wyniki Operacyjne</h2>
         
         <div class="pb-wrapper">
-            <div class="pb-name">Patryk</div>
+            <div class="pb-header">
+                <span class="pb-name">PATRYK</span>
+                <span class="pb-total" id="sum-patryk">SUMA: 0.0 KG</span>
+            </div>
             <div class="pb-container">
                 <div class="pb-bar" id="pb-patryk"></div>
-                <div class="pb-text" id="txt-patryk">0.0 KG / 0%</div>
+                <div class="pb-text" id="txt-patryk">PB: 0.0 KG / 0%</div>
             </div>
         </div>
 
         <div class="pb-wrapper">
-            <div class="pb-name">Maciek</div>
+            <div class="pb-header">
+                <span class="pb-name">MACIEK</span>
+                <span class="pb-total" id="sum-maciek">SUMA: 0.0 KG</span>
+            </div>
             <div class="pb-container">
                 <div class="pb-bar" id="pb-maciek"></div>
-                <div class="pb-text" id="txt-maciek">0.0 KG / 0%</div>
+                <div class="pb-text" id="txt-maciek">PB: 0.0 KG / 0%</div>
             </div>
         </div>
 
-        <div style="font-size: 0.7rem; color: #666; border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">
-            <i class="fas fa-map-marker-alt"></i> Lokalizacja: Stek 2 (Francja)<br>
-            <i class="fas fa-info-circle"></i> Tylko haki bezdziorowe!
+        <div style="font-size: 0.7rem; color: #555; border-top: 1px solid #222; padding-top: 15px; margin-top: 10px;">
+            <i class="fas fa-bullseye"></i> TARGET PB: 20.0 KG<br>
+            <i class="fas fa-location-arrow"></i> Sektor: La Plaine des Bois 2
         </div>
     </div>
 
@@ -146,7 +153,6 @@
     setInterval(updateCountdown, 60000);
     updateCountdown();
 
-    // Fish Logic
     function addFish() {
         const fish = {
             id: Date.now(),
@@ -158,62 +164,59 @@
             fullDate: new Date().toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})
         };
         if(isNaN(fish.kg)) return alert("Podaj wagę!");
-
-        let catches = JSON.parse(localStorage.getItem('ryby_v6_data') || "[]");
+        let catches = JSON.parse(localStorage.getItem('ryby_v7_data') || "[]");
         catches.unshift(fish);
-        localStorage.setItem('ryby_v6_data', JSON.stringify(catches));
-        
+        localStorage.setItem('ryby_v7_data', JSON.stringify(catches));
         document.getElementById('weight').value = '';
         renderAll();
     }
 
-    // Inventory Logic
     function addInv() {
         const name = document.getElementById('inv-name').value;
         const qty = document.getElementById('inv-qty').value;
         if(!name) return;
-        let inv = JSON.parse(localStorage.getItem('ryby_v6_inv') || "[]");
+        let inv = JSON.parse(localStorage.getItem('ryby_v7_inv') || "[]");
         inv.push({id: Date.now(), name, qty});
-        localStorage.setItem('ryby_v6_inv', JSON.stringify(inv));
+        localStorage.setItem('ryby_v7_inv', JSON.stringify(inv));
         document.getElementById('inv-name').value = '';
         document.getElementById('inv-qty').value = '';
         renderAll();
     }
 
     function delInv(id) {
-        let inv = JSON.parse(localStorage.getItem('ryby_v6_inv') || "[]");
+        let inv = JSON.parse(localStorage.getItem('ryby_v7_inv') || "[]");
         inv = inv.filter(item => item.id !== id);
-        localStorage.setItem('ryby_v6_inv', JSON.stringify(inv));
+        localStorage.setItem('ryby_v7_inv', JSON.stringify(inv));
         renderAll();
     }
 
     function renderAll() {
-        // Render History
-        const catches = JSON.parse(localStorage.getItem('ryby_v6_data') || "[]");
+        const catches = JSON.parse(localStorage.getItem('ryby_v7_data') || "[]");
         document.getElementById('catch-history').innerHTML = catches.map(f => `
             <div class="catch-item">
                 <div>
                     <div class="catch-main">${f.kg} KG</div>
                     <div class="catch-sub">${f.who} | ${f.what}</div>
-                    <div class="catch-sub">Przynęta: ${f.bait} | Spot: #${f.spot}</div>
+                    <div class="catch-sub">Zanęta: ${f.bait} | Spot: #${f.spot}</div>
                 </div>
-                <div style="text-align:right; font-size:0.65rem; color:#666;">${f.fullDate}</div>
+                <div style="text-align:right; font-size:0.6rem; color:#555;">${f.fullDate}</div>
             </div>
         `).join('');
 
-        // Update PB bars
-        const updatePB = (name, barId, txtId) => {
+        const updateStats = (name, barId, txtId, sumId) => {
             const userFish = catches.filter(f => f.who === name).map(f => f.kg);
             const max = userFish.length > 0 ? Math.max(...userFish) : 0;
+            const total = userFish.reduce((a, b) => a + b, 0);
             const pct = Math.min((max / TARGET_PB) * 100, 100).toFixed(1);
+            
             document.getElementById(barId).style.width = pct + '%';
-            document.getElementById(txtId).innerHTML = `${max.toFixed(1)} KG / ${pct}%`;
+            document.getElementById(txtId).innerHTML = `PB: ${max.toFixed(1)} KG / ${pct}%`;
+            document.getElementById(sumId).innerHTML = `SUMA: ${total.toFixed(1)} KG`;
         };
-        updatePB('Patryk', 'pb-patryk', 'txt-patryk');
-        updatePB('Maciek', 'pb-maciek', 'txt-maciek');
+        updateStats('Patryk', 'pb-patryk', 'txt-patryk', 'sum-patryk');
+        updateStats('Maciek', 'pb-maciek', 'txt-maciek', 'sum-maciek');
 
-        // Render Inventory
-        const inv = JSON.parse(localStorage.getItem('ryby_v6_inv') || "[]");
+        const inv = JSON.parse(localStorage.getItem('ryby_v7_inv') || "[]");
         document.getElementById('inv-list').innerHTML = inv.map(i => `
             <div class="inv-item">
                 <span>${i.name} <small style="color:var(--neon-green)">(${i.qty})</small></span>
@@ -221,7 +224,6 @@
             </div>
         `).join('');
     }
-
     renderAll();
 </script>
 

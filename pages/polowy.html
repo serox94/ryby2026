@@ -46,16 +46,18 @@
       <div>
         <h2>Połowy</h2>
         <p>
-          Tutaj dodajecie wszystkie ryby. Dane zapisują się online, więc są wspólne dla Ciebie i Maćka.
+          Dodawanie, edycja i usuwanie połowów. Dane są wspólne i aktualizują się na żywo.
         </p>
       </div>
     </section>
 
     <section class="two-column">
       <article class="panel-card">
-        <h3>Dodaj połów</h3>
+        <h3 id="catch-form-title">Dodaj połów</h3>
 
         <form id="catch-form" class="form-grid">
+          <input type="hidden" id="edit-catch-id" />
+
           <div class="form-row">
             <div>
               <label for="person">Osoba</label>
@@ -85,23 +87,33 @@
 
           <div class="form-row">
             <div>
-              <label for="spot">Spot</label>
+              <label for="spot">Spot (tekst)</label>
               <input type="text" id="spot" placeholder="np. Spot 3" maxlength="50" required />
             </div>
 
             <div>
-              <label for="caught_at">Data i godzina</label>
-              <input type="datetime-local" id="caught_at" required />
+              <label for="spot-id">Spot z mapy</label>
+              <select id="spot-id">
+                <option value="">Brak powiązania</option>
+              </select>
             </div>
           </div>
 
-          <div>
-            <label for="note">Notatka</label>
-            <textarea id="note" rows="4" placeholder="Opcjonalna notatka..."></textarea>
+          <div class="form-row">
+            <div>
+              <label for="caught_at">Data i godzina</label>
+              <input type="datetime-local" id="caught_at" required />
+            </div>
+
+            <div>
+              <label for="note">Notatka</label>
+              <input type="text" id="note" maxlength="120" placeholder="Opcjonalna notatka" />
+            </div>
           </div>
 
           <div class="form-actions">
-            <button type="submit">Dodaj połów</button>
+            <button type="submit" id="save-catch-btn">Dodaj połów</button>
+            <button type="button" id="cancel-edit-catch-btn" class="secondary-btn hidden">Anuluj edycję</button>
           </div>
 
           <div id="form-message" class="form-message" aria-live="polite"></div>
@@ -116,6 +128,8 @@
           <div><span>Łączna waga</span><strong id="catch-total-weight">0.0 kg</strong></div>
           <div><span>Największa ryba</span><strong id="catch-biggest">Brak</strong></div>
           <div><span>Najczęstszy spot</span><strong id="catch-best-spot">Brak</strong></div>
+          <div><span>Najlepsza przynęta</span><strong id="catch-best-bait">Brak</strong></div>
+          <div><span>Najlepsza pora</span><strong id="catch-best-hour">Brak</strong></div>
         </div>
       </article>
     </section>

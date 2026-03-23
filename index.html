@@ -14,6 +14,7 @@
           <h1>Ryby 2026</h1>
           <p class="subtitle">LodgingCarp – La Plaine des Bois 2</p>
         </div>
+
         <div class="trip-box">
           <div><strong>Wyjazd:</strong> 20.06.2026, 14:00</div>
           <div><strong>Powrót:</strong> 27.06.2026, 10:00</div>
@@ -43,58 +44,59 @@
   <main class="container page-content">
     <section class="hero-card">
       <div>
-        <h2>Panel główny wyjazdu</h2>
+        <h2>Centrum dowodzenia wyjazdu</h2>
         <p>
-          Centrum dowodzenia dla wyjazdu Ryby 2026: połowy, statystyki, pogoda, węzły, rigi, checklisty i mapa spotów.
+          Wszystko w jednym miejscu: statystyki połowów, najlepsze spoty, checklisty, pogoda pod brania,
+          praktyczna wiedza i szybkie wejście do najważniejszych sekcji.
         </p>
       </div>
     </section>
 
     <section class="stats-grid">
       <article class="stat-card">
-        <span class="label">Łącznie złowiono</span>
+        <span class="label">🎣 Łącznie złowiono</span>
         <strong id="total-weight">0.0 kg</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Liczba ryb</span>
+        <span class="label">🐟 Liczba ryb</span>
         <strong id="total-fish">0</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Największa ryba wyjazdu</span>
+        <span class="label">🏆 Największa ryba wyjazdu</span>
         <strong id="biggest-fish">Brak danych</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Najlepszy spot ogólnie</span>
+        <span class="label">📍 Najlepszy spot ogólnie</span>
         <strong id="best-spot">Brak danych</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Najlepsza przynęta</span>
+        <span class="label">🪱 Najlepsza przynęta</span>
         <strong id="best-bait-global">Brak danych</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Najlepsza pora brań</span>
+        <span class="label">⏰ Najlepsza pora</span>
         <strong id="best-hour-global">Brak danych</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Liczba spotów</span>
+        <span class="label">🗺️ Liczba spotów</span>
         <strong id="spots-count-dashboard">0</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Odhaczone checklisty</span>
+        <span class="label">✅ Zrobione w checklistach</span>
         <strong id="checklist-done-dashboard">0</strong>
       </article>
     </section>
 
     <section class="two-column">
       <article class="panel-card">
-        <h3>Patryk</h3>
+        <h3>👤 Patryk</h3>
 
         <div class="mini-stats">
           <div><span>Największa ryba</span><strong id="patryk-biggest">0.0 kg</strong></div>
@@ -116,7 +118,7 @@
       </article>
 
       <article class="panel-card">
-        <h3>Maciek</h3>
+        <h3>👤 Maciek</h3>
 
         <div class="mini-stats">
           <div><span>Największa ryba</span><strong id="maciek-biggest">0.0 kg</strong></div>
@@ -140,24 +142,36 @@
 
     <section class="two-column">
       <article class="panel-card">
-        <h3>Ostatni wpis</h3>
+        <h3>🕘 Ostatni wpis</h3>
         <div id="last-entry" class="empty-box">
           Brak zapisanych połowów.
         </div>
       </article>
 
       <article class="panel-card">
-        <h3>Szybki podgląd</h3>
+        <h3>🚀 Szybkie wejście</h3>
         <div class="quick-links">
-          <a href="pages/polowy.html">Przejdź do połowów</a>
-          <a href="pages/pogoda.html">Przejdź do pogody</a>
-          <a href="pages/checklisty.html">Przejdź do checklist</a>
-          <a href="pages/mapa.html">Przejdź do mapy spotów</a>
+          <a href="pages/polowy.html">Dodaj lub sprawdź połowy</a>
+          <a href="pages/pogoda.html">Sprawdź pogodę pod brania</a>
+          <a href="pages/checklisty.html">Odhacz checklisty</a>
+          <a href="pages/mapa.html">Zarządzaj spotami</a>
+          <a href="pages/rigi.html">Dobierz rig</a>
+          <a href="pages/wezly.html">Odśwież węzły</a>
+          <a href="pages/porady.html">Praktyczne porady</a>
         </div>
       </article>
     </section>
+
+    <section class="panel-card">
+      <div class="section-head">
+        <h3>📊 Podgląd wyników</h3>
+        <span class="section-chip">live</span>
+      </div>
+      <canvas id="fishChart"></canvas>
+    </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>

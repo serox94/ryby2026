@@ -7,7 +7,7 @@ const SUPABASE_URL = "https://baiepgxqnppwokcmmpqw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ziiHPrhOisVJXnUeOdI4ug_b4y4djws";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Fallback sample data if DB empty
+// fallback if db empty
 const fallbackCatches = [
   {
     person: "Patryk",
@@ -15,6 +15,7 @@ const fallbackCatches = [
     weight: 14.2,
     bait: "Scopex",
     spot: "Spot 3",
+    note: null,
     caught_at: "2026-06-21T05:40:00"
   },
   {
@@ -23,6 +24,7 @@ const fallbackCatches = [
     weight: 11.8,
     bait: "Halibut",
     spot: "Spot 1",
+    note: null,
     caught_at: "2026-06-21T22:10:00"
   },
   {
@@ -31,6 +33,7 @@ const fallbackCatches = [
     weight: 16.7,
     bait: "Scopex",
     spot: "Spot 3",
+    note: null,
     caught_at: "2026-06-22T04:55:00"
   }
 ];
@@ -57,6 +60,19 @@ function updateCountdown() {
   }
 
   countdownEl.innerHTML = `<strong>Status:</strong> wyjazd zakończony`;
+}
+
+function setupMobileMenu() {
+  const toggleBtn = document.getElementById("menu-toggle");
+  const nav = document.getElementById("main-nav");
+
+  if (!toggleBtn || !nav) return;
+
+  toggleBtn.addEventListener("click", () => {
+    nav.classList.toggle("open");
+    const expanded = nav.classList.contains("open");
+    toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+  });
 }
 
 function formatCaughtAt(value) {
@@ -203,39 +219,6 @@ function updateDashboard(catches) {
   `;
 }
 
-async function loadCatchesFromSupabase() {
-  const { data, error } = await supabaseClient
-    .from("catches")
-    .select("*")
-    .order("caught_at", { ascending: false });
-
-  if (error) {
-    console.error("Błąd pobierania catches:", error);
-    updateDashboard(fallbackCatches);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    updateDashboard(fallbackCatches);
-    return;
-  }
-
-  updateDashboard(data);
-}
-
-function setupMobileMenu() {
-  const toggleBtn = document.getElementById("menu-toggle");
-  const nav = document.getElementById("main-nav");
-
-  if (!toggleBtn || !nav) return;
-
-  toggleBtn.addEventListener("click", () => {
-    nav.classList.toggle("open");
-    const expanded = nav.classList.contains("open");
-    toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
-  });
-}
-
 async function seedSampleDataIfEmpty() {
   const { count, error } = await supabaseClient
     .from("catches")
@@ -257,12 +240,210 @@ async function seedSampleDataIfEmpty() {
   }
 }
 
-async function init() {
+async function loadCatchesFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("catches")
+    .select("*")
+    .order("caught_at", { ascending: false });
+
+  if (error) {
+    console.error("Błąd pobierania catches:", error);
+    return fallbackCatches;
+  }
+
+  if (!data || data.length === 0) {
+    return fallbackCatches;
+  }
+
+  return data;
+}
+
+function setDefaultCaughtAt() {
+  const input = document.getElementById("caught_at");
+  if (!input) return;
+
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  const local = new Date(now.getTime() - offset * 60000).toISOString().slice(0, 16);
+  input.value = local;
+}
+
+function setFormMessage(message, type = "") {
+  const box = document.getElementById("form-message");
+  if (!box) return;
+
+  box.textContent = message;
+  box.className = "form-message";
+  if (type) box.classList.add(type);
+}
+
+function validateCatchForm(values) {
+  if (!values.person) return "Wybierz osobę.";
+  if (!values.species.trim()) return "Podaj gatunek.";
+  if (!values.weight || Number(values.weight) <= 0) return "Podaj poprawną wagę.";
+  if (!values.bait.trim()) return "Podaj przynętę.";
+  if (!values.spot.trim()) return "Podaj spot.";
+  if (!values.caught_at) return "Podaj datę i godzinę.";
+  return null;
+}
+
+async function handleCatchSubmit(event) {
+  event.preventDefault();
+
+  const values = {
+    person: document.getElementById("person")?.value || "",
+    species: document.getElementById("species")?.value || "",
+    weight: document.getElementById("weight")?.value || "",
+    bait: document.getElementById("bait")?.value || "",
+    spot: document.getElementById("spot")?.value || "",
+    caught_at: document.getElementById("caught_at")?.value || "",
+    note: document.getElementById("note")?.value || ""
+  };
+
+  const validationError = validateCatchForm(values);
+  if (validationError) {
+    setFormMessage(validationError, "error");
+    return;
+  }
+
+  setFormMessage("Zapisywanie połowu...");
+
+  const payload = {
+    person: values.person.trim(),
+    species: values.species.trim(),
+    weight: Number(values.weight),
+    bait: values.bait.trim(),
+    spot: values.spot.trim(),
+    note: values.note.trim() || null,
+    caught_at: new Date(values.caught_at).toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from("catches")
+    .insert([payload]);
+
+  if (error) {
+    console.error("Błąd dodawania połowu:", error);
+    setFormMessage("Nie udało się dodać połowu.", "error");
+    return;
+  }
+
+  setFormMessage("Połów został dodany.", "success");
+  document.getElementById("catch-form")?.reset();
+  setDefaultCaughtAt();
+  await renderCatchesPage();
+}
+
+async function deleteCatch(id) {
+  const confirmed = window.confirm("Usunąć ten połów?");
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from("catches")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Błąd usuwania połowu:", error);
+    alert("Nie udało się usunąć połowu.");
+    return;
+  }
+
+  await renderCatchesPage();
+}
+
+function renderCatchSummary(catches) {
+  const countEl = document.getElementById("catch-count");
+  if (!countEl) return;
+
+  const stats = getStats(catches);
+  countEl.textContent = catches.length;
+  document.getElementById("catch-total-weight").textContent = `${stats.totalWeight.toFixed(1)} kg`;
+  document.getElementById("catch-biggest").textContent = stats.biggestFish;
+  document.getElementById("catch-best-spot").textContent = stats.bestSpot;
+}
+
+function renderCatchesList(catches) {
+  const list = document.getElementById("catches-list");
+  if (!list) return;
+
+  if (!catches.length) {
+    list.innerHTML = `<div class="empty-box">Brak zapisanych połowów.</div>`;
+    return;
+  }
+
+  list.innerHTML = catches.map(item => `
+    <article class="catch-item">
+      <div class="catch-item-top">
+        <div>
+          <h4>${item.person} — ${item.species}</h4>
+          <div class="catch-meta">${formatCaughtAt(item.caught_at)}</div>
+        </div>
+        <div>
+          <button class="danger-btn" onclick="deleteCatch(${item.id})">Usuń</button>
+        </div>
+      </div>
+
+      <div class="catch-badges">
+        <span class="badge">Waga: ${Number(item.weight).toFixed(1)} kg</span>
+        <span class="badge">Przynęta: ${item.bait}</span>
+        <span class="badge">Spot: ${item.spot}</span>
+      </div>
+
+      ${item.note ? `<div class="catch-note">${item.note}</div>` : ""}
+    </article>
+  `).join("");
+}
+
+async function renderCatchesPage() {
+  const list = document.getElementById("catches-list");
+  if (!list) return;
+
+  list.innerHTML = `<div class="empty-box">Ładowanie połowów...</div>`;
+  const catches = await loadCatchesFromSupabase();
+  renderCatchSummary(catches);
+  renderCatchesList(catches);
+}
+
+function bindCatchesPageEvents() {
+  const form = document.getElementById("catch-form");
+  if (form) {
+    form.addEventListener("submit", handleCatchSubmit);
+  }
+
+  const refreshBtn = document.getElementById("refresh-catches-btn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", renderCatchesPage);
+  }
+}
+
+async function initDashboardPage() {
   updateCountdown();
   setupMobileMenu();
   await seedSampleDataIfEmpty();
-  await loadCatchesFromSupabase();
+  const catches = await loadCatchesFromSupabase();
+  updateDashboard(catches);
   setInterval(updateCountdown, 30000);
 }
 
-init();
+async function initCatchesPage() {
+  updateCountdown();
+  setupMobileMenu();
+  setDefaultCaughtAt();
+  bindCatchesPageEvents();
+  await renderCatchesPage();
+  setInterval(updateCountdown, 30000);
+}
+
+const isDashboardPage = document.getElementById("total-weight");
+const isCatchesPage = document.getElementById("catch-form");
+
+if (isDashboardPage) {
+  initDashboardPage();
+}
+
+if (isCatchesPage) {
+  initCatchesPage();
+}
+
+window.deleteCatch = deleteCatch;

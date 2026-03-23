@@ -46,7 +46,8 @@
       <div>
         <h2>Pogoda PRO</h2>
         <p>
-          Pogoda dla łowiska z interpretacją pod karpiowanie: temperatura, wiatr, kierunek, ciśnienie, opady i trend.
+          Warunki pod brania i obozowanie: temperatura, wiatr, porywy, ciśnienie, trend, wilgotność, punkt rosy,
+          zachmurzenie, opady, widzialność, UV, gleba, słońce i faza księżyca.
         </p>
       </div>
     </section>
@@ -58,12 +59,12 @@
       </article>
 
       <article class="stat-card">
-        <span class="label">Wiatr</span>
+        <span class="label">Wiatr / porywy</span>
         <strong id="weather-current-wind">--</strong>
       </article>
 
       <article class="stat-card">
-        <span class="label">Ciśnienie</span>
+        <span class="label">Ciśnienie / trend</span>
         <strong id="weather-current-pressure">--</strong>
       </article>
 
@@ -75,11 +76,7 @@
 
     <section class="two-column">
       <article class="panel-card">
-        <div class="section-head">
-          <h3>Aktualne warunki</h3>
-          <button id="refresh-weather-btn" type="button" class="secondary-btn">Odśwież</button>
-        </div>
-
+        <h3>Brania — teraz</h3>
         <div class="mini-stats">
           <div><span>Opis</span><strong id="weather-description">--</strong></div>
           <div><span>Odczuwalna</span><strong id="weather-apparent-temp">--</strong></div>
@@ -87,13 +84,60 @@
           <div><span>Zachmurzenie</span><strong id="weather-cloud-cover">--</strong></div>
           <div><span>Opad</span><strong id="weather-precipitation">--</strong></div>
           <div><span>Wilgotność</span><strong id="weather-humidity">--</strong></div>
+          <div><span>Punkt rosy</span><strong id="weather-dew-point">--</strong></div>
+          <div><span>Widzialność</span><strong id="weather-visibility">--</strong></div>
+          <div><span>UV</span><strong id="weather-uv">--</strong></div>
+          <div><span>Nasłonecznienie dziś</span><strong id="weather-sunshine">--</strong></div>
         </div>
       </article>
 
       <article class="panel-card">
-        <h3>Interpretacja dla karpiarza</h3>
+        <h3>Obozowanie / noc</h3>
+        <div class="mini-stats">
+          <div><span>Temperatura nocą</span><strong id="camp-night-temp">--</strong></div>
+          <div><span>Wiatr nocą</span><strong id="camp-night-wind">--</strong></div>
+          <div><span>Porywy nocą</span><strong id="camp-night-gusts">--</strong></div>
+          <div><span>Wilgotność nocą</span><strong id="camp-night-humidity">--</strong></div>
+          <div><span>Mgła / widzialność</span><strong id="camp-night-visibility">--</strong></div>
+          <div><span>Komfort nocny</span><strong id="camp-night-rating">--</strong></div>
+          <div><span>Faza księżyca</span><strong id="moon-phase">--</strong></div>
+          <div><span>Oświetlenie księżyca</span><strong id="moon-illumination">--</strong></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="two-column">
+      <article class="panel-card">
+        <h3>Interpretacja pod brania</h3>
         <div id="weather-interpretation" class="weather-interpretation">
           Ładowanie interpretacji...
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <h3>Wniosek dla obozowania</h3>
+        <div id="camp-interpretation" class="weather-interpretation">
+          Ładowanie interpretacji...
+        </div>
+      </article>
+    </section>
+
+    <section class="two-column">
+      <article class="panel-card">
+        <h3>Gleba i warunki przy brzegu</h3>
+        <div class="mini-stats">
+          <div><span>Temp. gleby 0–10 cm</span><strong id="soil-temp">--</strong></div>
+          <div><span>Wilgotność gleby 0–10 cm</span><strong id="soil-moisture">--</strong></div>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <div class="section-head">
+          <h3>Odśwież</h3>
+          <button id="refresh-weather-btn" type="button" class="secondary-btn">Pobierz pogodę</button>
+        </div>
+        <div class="empty-box">
+          Ta zakładka jest nastawiona na decyzję: czy warunki sprzyjają braniom, czy noc będzie komfortowa i czy warto pilnować zmian frontu.
         </div>
       </article>
     </section>
@@ -106,7 +150,7 @@
     </section>
 
     <section class="panel-card">
-      <h3>Prognoza dzienna — najbliższe dni</h3>
+      <h3>Prognoza dzienna — najbliższe 7 dni</h3>
       <div id="weather-daily-list" class="weather-daily-list">
         <div class="empty-box">Ładowanie prognozy dziennej...</div>
       </div>

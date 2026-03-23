@@ -7,6 +7,13 @@ const SUPABASE_URL = "https://baiepgxqnppwokcmmpqw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ziiHPrhOisVJXnUeOdI4ug_b4y4djws";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Łowisko: La Plaine des Bois 2, Coullons area
+const FISHING_SPOT = {
+  name: "LodgingCarp – La Plaine des Bois 2",
+  latitude: 47.621,
+  longitude: 2.49
+};
+
 // fallback if db empty
 const fallbackCatches = [
   {
@@ -79,6 +86,25 @@ function formatCaughtAt(value) {
   if (!value) return "Brak daty";
   const date = new Date(value);
   return date.toLocaleString("pl-PL");
+}
+
+function formatHour(value) {
+  const date = new Date(value);
+  return date.toLocaleString("pl-PL", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function formatDay(value) {
+  const date = new Date(value);
+  return date.toLocaleDateString("pl-PL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit"
+  });
 }
 
 function getStats(data) {
@@ -611,6 +637,226 @@ function bindChecklistPageEvents() {
   }
 }
 
+// POGODA PRO
+
+function weatherCodeToText(code) {
+  const map = {
+    0: "Bezchmurnie",
+    1: "Przeważnie pogodnie",
+    2: "Częściowe zachmurzenie",
+    3: "Pochmurno",
+    45: "Mgła",
+    48: "Mgła osadzająca",
+    51: "Lekka mżawka",
+    53: "Mżawka",
+    55: "Silna mżawka",
+    61: "Słaby deszcz",
+    63: "Deszcz",
+    65: "Silny deszcz",
+    66: "Marznący deszcz",
+    67: "Silny marznący deszcz",
+    71: "Słaby śnieg",
+    73: "Śnieg",
+    75: "Silny śnieg",
+    77: "Ziarnisty śnieg",
+    80: "Przelotne opady",
+    81: "Przelotny deszcz",
+    82: "Silne przelotne opady",
+    95: "Burza",
+    96: "Burza z gradem",
+    99: "Silna burza z gradem"
+  };
+  return map[code] || `Kod ${code}`;
+}
+
+function windDirectionToText(deg) {
+  if (deg === null || deg === undefined) return "Brak";
+  const dirs = [
+    "Północ", "Północny-wschód", "Wschód", "Południowy-wschód",
+    "Południe", "Południowy-zachód", "Zachód", "Północny-zachód"
+  ];
+  const index = Math.round(deg / 45) % 8;
+  return `${dirs[index]} (${Math.round(deg)}°)`;
+}
+
+function getPressureTrend(hourlyPressure) {
+  if (!hourlyPressure || hourlyPressure.length < 4) return "Brak danych";
+  const start = hourlyPressure[0];
+  const later = hourlyPressure[3];
+  const diff = later - start;
+
+  if (diff >= 2) return "Rośnie";
+  if (diff <= -2) return "Spada";
+  return "Stabilne";
+}
+
+function getWeatherRating(current, hourly) {
+  const wind = current.wind_speed_10m ?? 0;
+  const pressure = current.pressure_msl ?? 0;
+  const precipitation = current.precipitation ?? 0;
+  const trend = getPressureTrend(hourly.pressure_msl);
+
+  let score = 0;
+
+  if (wind >= 8 && wind <= 22) score += 2;
+  else if (wind > 22) score += 1;
+
+  if (pressure >= 1005 && pressure <= 1020) score += 2;
+  else if (pressure >= 995 && pressure <= 1025) score += 1;
+
+  if (trend === "Spada") score += 2;
+  if (trend === "Stabilne") score += 1;
+
+  if (precipitation > 0 && precipitation <= 2) score += 1;
+  if (precipitation > 5) score -= 1;
+
+  if (score >= 5) return "Dobre";
+  if (score >= 3) return "Średnie";
+  return "Słabe";
+}
+
+function buildWeatherInterpretation(current, hourly) {
+  const notes = [];
+  const wind = current.wind_speed_10m ?? 0;
+  const pressure = current.pressure_msl ?? 0;
+  const direction = windDirectionToText(current.wind_direction_10m);
+  const trend = getPressureTrend(hourly.pressure_msl);
+
+  if (trend === "Spada") {
+    notes.push("Ciśnienie spada — często przed zmianą pogody aktywność ryb potrafi wzrosnąć.");
+  } else if (trend === "Rośnie") {
+    notes.push("Ciśnienie rośnie — ryby mogą żerować ostrożniej, warto łowić precyzyjniej.");
+  } else {
+    notes.push("Ciśnienie jest dość stabilne — warunki są przewidywalne, bez gwałtownych zmian.");
+  }
+
+  if (wind >= 8 && wind <= 22) {
+    notes.push(`Wiatr jest sensowny (${wind.toFixed(1)} km/h), co często pomaga. Kierunek: ${direction}.`);
+  } else if (wind > 22) {
+    notes.push(`Wiatr jest mocny (${wind.toFixed(1)} km/h). Może pomagać, ale prezentacja zestawu musi być pewna.`);
+  } else {
+    notes.push(`Wiatr jest słaby (${wind.toFixed(1)} km/h). Ryby mogą być bardziej rozproszone.`);
+  }
+
+  if (pressure >= 1022) {
+    notes.push(`Ciśnienie jest dość wysokie (${pressure.toFixed(0)} hPa). To nie przekreśla łowienia, ale czasem trzeba łowić delikatniej i dokładniej.`);
+  } else if (pressure <= 1000) {
+    notes.push(`Ciśnienie jest niskie (${pressure.toFixed(0)} hPa). Często to dobry moment na aktywność ryb, zwłaszcza przed frontem.`);
+  } else {
+    notes.push(`Ciśnienie jest w rozsądnym zakresie (${pressure.toFixed(0)} hPa).`);
+  }
+
+  return notes;
+}
+
+async function fetchWeatherData() {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${FISHING_SPOT.latitude}&longitude=${FISHING_SPOT.longitude}&current=temperature_2m,apparent_temperature,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m,relative_humidity_2m,cloud_cover&hourly=temperature_2m,pressure_msl,wind_speed_10m,wind_direction_10m,precipitation,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&timezone=auto&forecast_days=7`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Błąd pogody: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+function renderWeatherCurrent(data) {
+  const current = data.current;
+  const hourly = data.hourly;
+
+  document.getElementById("weather-current-temp").textContent = `${current.temperature_2m.toFixed(1)}°C`;
+  document.getElementById("weather-current-wind").textContent = `${current.wind_speed_10m.toFixed(1)} km/h`;
+  document.getElementById("weather-current-pressure").textContent = `${current.pressure_msl.toFixed(0)} hPa`;
+  document.getElementById("weather-rating").textContent = getWeatherRating(current, hourly);
+
+  document.getElementById("weather-description").textContent = weatherCodeToText(current.weather_code);
+  document.getElementById("weather-apparent-temp").textContent = `${current.apparent_temperature.toFixed(1)}°C`;
+  document.getElementById("weather-wind-direction").textContent = windDirectionToText(current.wind_direction_10m);
+  document.getElementById("weather-cloud-cover").textContent = `${current.cloud_cover}%`;
+  document.getElementById("weather-precipitation").textContent = `${current.precipitation.toFixed(1)} mm`;
+  document.getElementById("weather-humidity").textContent = `${current.relative_humidity_2m}%`;
+
+  const notes = buildWeatherInterpretation(current, hourly);
+  document.getElementById("weather-interpretation").innerHTML = notes
+    .map(note => `<div class="weather-note">${note}</div>`)
+    .join("");
+}
+
+function renderWeatherHourly(data) {
+  const container = document.getElementById("weather-hourly-list");
+  if (!container) return;
+
+  const times = data.hourly.time.slice(0, 24);
+  const temps = data.hourly.temperature_2m.slice(0, 24);
+  const winds = data.hourly.wind_speed_10m.slice(0, 24);
+  const windDirs = data.hourly.wind_direction_10m.slice(0, 24);
+  const pressure = data.hourly.pressure_msl.slice(0, 24);
+  const precipitation = data.hourly.precipitation.slice(0, 24);
+
+  container.innerHTML = times.map((time, index) => `
+    <div class="weather-row">
+      <strong>${formatHour(time)}</strong>
+      <div class="weather-chip">${temps[index].toFixed(1)}°C</div>
+      <div class="weather-chip">${winds[index].toFixed(1)} km/h</div>
+      <div class="weather-chip">${windDirectionToText(windDirs[index])}</div>
+      <div class="weather-chip">${pressure[index].toFixed(0)} hPa</div>
+      <div class="weather-chip">${precipitation[index].toFixed(1)} mm</div>
+    </div>
+  `).join("");
+}
+
+function renderWeatherDaily(data) {
+  const container = document.getElementById("weather-daily-list");
+  if (!container) return;
+
+  const times = data.daily.time;
+  const weatherCodes = data.daily.weather_code;
+  const tempMax = data.daily.temperature_2m_max;
+  const tempMin = data.daily.temperature_2m_min;
+  const precip = data.daily.precipitation_sum;
+  const windMax = data.daily.wind_speed_10m_max;
+  const windDir = data.daily.wind_direction_10m_dominant;
+
+  container.innerHTML = times.map((time, index) => `
+    <div class="weather-row">
+      <strong>${formatDay(time)}</strong>
+      <div class="weather-chip">${weatherCodeToText(weatherCodes[index])}</div>
+      <div class="weather-chip">Min ${tempMin[index].toFixed(1)}°C / Max ${tempMax[index].toFixed(1)}°C</div>
+      <div class="weather-chip">Opad ${precip[index].toFixed(1)} mm</div>
+      <div class="weather-chip">Wiatr ${windMax[index].toFixed(1)} km/h</div>
+      <div class="weather-chip">${windDirectionToText(windDir[index])}</div>
+    </div>
+  `).join("");
+}
+
+async function renderWeatherPage() {
+  const tempEl = document.getElementById("weather-current-temp");
+  if (!tempEl) return;
+
+  try {
+    document.getElementById("weather-current-temp").textContent = "Ładowanie...";
+    const data = await fetchWeatherData();
+    renderWeatherCurrent(data);
+    renderWeatherHourly(data);
+    renderWeatherDaily(data);
+  } catch (error) {
+    console.error(error);
+    document.getElementById("weather-current-temp").textContent = "Błąd";
+    document.getElementById("weather-current-wind").textContent = "Błąd";
+    document.getElementById("weather-current-pressure").textContent = "Błąd";
+    document.getElementById("weather-rating").textContent = "Błąd";
+    document.getElementById("weather-description").textContent = "Nie udało się pobrać pogody";
+    document.getElementById("weather-interpretation").innerHTML = `<div class="weather-note">Nie udało się pobrać danych pogodowych. Spróbuj odświeżyć.</div>`;
+  }
+}
+
+function bindWeatherPageEvents() {
+  const refreshBtn = document.getElementById("refresh-weather-btn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", renderWeatherPage);
+  }
+}
+
 async function initDashboardPage() {
   updateCountdown();
   setupMobileMenu();
@@ -637,9 +883,18 @@ async function initChecklistPage() {
   setInterval(updateCountdown, 30000);
 }
 
+async function initWeatherPage() {
+  updateCountdown();
+  setupMobileMenu();
+  bindWeatherPageEvents();
+  await renderWeatherPage();
+  setInterval(updateCountdown, 30000);
+}
+
 const isDashboardPage = document.getElementById("total-weight");
 const isCatchesPage = document.getElementById("catch-form");
 const isChecklistPage = document.getElementById("checklist-form");
+const isWeatherPage = document.getElementById("weather-current-temp");
 
 if (isDashboardPage) {
   initDashboardPage();
@@ -651,6 +906,10 @@ if (isCatchesPage) {
 
 if (isChecklistPage) {
   initChecklistPage();
+}
+
+if (isWeatherPage) {
+  initWeatherPage();
 }
 
 window.deleteCatch = deleteCatch;

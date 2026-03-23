@@ -1,5 +1,5 @@
 (function () {
-  const $ = id => document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
 
   function getSupabaseClientSafe() {
     try {
@@ -160,6 +160,7 @@
   function pickNearestNightWindow(hourly, startIndex) {
     const times = hourly.time || [];
     const start = Math.max(0, startIndex);
+
     for (let i = start; i < times.length; i += 1) {
       const hour = new Date(times[i]).getHours();
       if (hour >= 22 || hour <= 5) {
@@ -190,6 +191,68 @@
     return "Dobra noc";
   }
 
+  function getHourWeightForBites(hour) {
+    if ((hour >= 4 && hour <= 8) || (hour >= 19 && hour <= 23)) return 2;
+    if ((hour >= 9 && hour <= 11) || (hour >= 16 && hour <= 18)) return 1;
+    return 0;
+  }
+
+  function getBiteScore(snapshot, trend, hour) {
+    let score = 0;
+
+    const temp = Number(snapshot.temperature_2m || 0);
+    const wind = Number(snapshot.wind_speed_10m || 0);
+    const gusts = Number(snapshot.wind_gusts_10m || 0);
+    const pressure = Number(snapshot.pressure_msl || 0);
+    const cloud = Number(snapshot.cloud_cover || 0);
+    const rain = Number(snapshot.precipitation || 0);
+
+    if (pressure >= 1002 && pressure <= 1022) score += 2;
+    else if (pressure >= 995 && pressure <= 1028) score += 1;
+    else score -= 1;
+
+    if (trend === "stabilne") score += 2;
+    else if (trend === "rośnie") score += 1;
+    else score -= 1;
+
+    if (temp >= 12 && temp <= 23) score += 2;
+    else if (temp >= 8 && temp <= 27) score += 1;
+    else score -= 1;
+
+    if (wind >= 8 && wind <= 22) score += 2;
+    else if (wind >= 4 && wind < 8) score += 1;
+    else if (wind > 30) score -= 1;
+
+    if (gusts <= 30) score += 1;
+    else if (gusts > 40) score -= 1;
+
+    if (cloud >= 25 && cloud <= 85) score += 2;
+    else if (cloud > 85) score += 1;
+
+    if (rain > 0 && rain <= 1.5) score += 1;
+    else if (rain > 4) score -= 1;
+
+    score += getHourWeightForBites(hour);
+
+    return score;
+  }
+
+  function biteScoreToLabel(score) {
+    if (score >= 10) return "Bardzo wysoka";
+    if (score >= 8) return "Wysoka";
+    if (score >= 6) return "Dobra";
+    if (score >= 4) return "Średnia";
+    return "Słaba";
+  }
+
+  function biteScoreToShortTactic(score) {
+    if (score >= 10) return "Mocno naciskaj";
+    if (score >= 8) return "Dobra zasiadka";
+    if (score >= 6) return "Warto pilnować";
+    if (score >= 4) return "Warunki średnie";
+    return "Trudniejsze warunki";
+  }
+
   function getWeatherRating(current, hourly, currentIndex) {
     let score = 0;
     const pressureTrend = getPressureTrend(hourly.pressure_msl, currentIndex);
@@ -213,11 +276,18 @@
     return "Słabe";
   }
 
+  function getDailyAmplitude(hourly, currentIndex) {
+    const start = Math.max(0, currentIndex - 6);
+    const end = Math.min(hourly.temperature_2m.length, currentIndex + 18);
+    const slice = hourly.temperature_2m.slice(start, end).map(Number);
+    if (!slice.length) return 0;
+    return Math.max(...slice) - Math.min(...slice);
+  }
+
   function buildWeatherInterpretation(current, hourly, currentIndex) {
     const notes = [];
     const wind = Number(current.wind_speed_10m || 0);
     const gusts = Number(current.wind_gusts_10m || 0);
-    const pressure = Number(current.pressure_msl || 0);
     const trend = getPressureTrend(hourly.pressure_msl, currentIndex);
     const cloud = Number(current.cloud_cover || 0);
     const rain = Number(current.precipitation || 0);
@@ -227,7 +297,7 @@
     else notes.push("Ciśnienie spada — możliwa zmiana pogody, pilnuj frontu i reakcji ryb.");
 
     if (wind >= 8 && wind <= 24) notes.push("Wiatr jest w sensownym zakresie i może pracować na wodzie na plus.");
-    else if (wind < 8) notes.push("Słaby wiatr — woda może być zbyt spokojna i mniej 'żywa'.");
+    else if (wind < 8) notes.push("Słaby wiatr — woda może być zbyt spokojna i mniej żywa.");
     else notes.push("Wiatr jest już dość mocny — ustawienie zestawów i komfort łowienia mogą być gorsze.");
 
     if (gusts > 35) notes.push("Mocniejsze porywy mogą pogarszać kontrolę nad zestawem i sygnalizacją.");
@@ -254,12 +324,176 @@
     return notes;
   }
 
+  function buildBiteAnalysis(data, currentIndex) {
+    const hourly = data.hourly;
+    const current = data.current;
+    const hour = new Date(data.current.time).getHours();
+    const trend = getPressureTrend(hourly.pressure_msl, currentIndex);
+    const currentScore = getBiteScore(current, trend, hour);
+    const label = biteScoreToLabel(currentScore);
+    const amplitude = getDailyAmplitude(hourly, currentIndex);
+
+    const notes = [];
+    const pressure = Number(current.pressure_msl || 0);
+    const temp = Number(current.temperature_2m || 0);
+    const wind = Number(current.wind_speed_10m || 0);
+    const gusts = Number(current.wind_gusts_10m || 0);
+    const cloud = Number(current.cloud_cover || 0);
+    const rain = Number(current.precipitation || 0);
+
+    notes.push(`Obecna szansa na branie: ${label}. Punktacja aktywności: ${currentScore}.`);
+
+    if (pressure >= 1002 && pressure <= 1022) {
+      notes.push(`Ciśnienie ${Math.round(pressure)} hPa jest w dobrym zakresie pod aktywność ryb.`);
+    } else if (pressure < 995 || pressure > 1028) {
+      notes.push(`Ciśnienie ${Math.round(pressure)} hPa jest mniej korzystne i może osłabiać żerowanie.`);
+    } else {
+      notes.push(`Ciśnienie ${Math.round(pressure)} hPa jest jeszcze akceptowalne, ale nie idealne.`);
+    }
+
+    if (trend === "stabilne") {
+      notes.push("Trend ciśnienia jest stabilny, co zwykle pomaga utrzymać bardziej przewidywalne żerowanie.");
+    } else if (trend === "rośnie") {
+      notes.push("Ciśnienie rośnie, więc warunki mogą iść w stronę poprawy.");
+    } else {
+      notes.push("Ciśnienie spada, więc aktywność może być nierówna i zależna od zmiany pogody.");
+    }
+
+    if (temp >= 12 && temp <= 23) {
+      notes.push(`Temperatura ${temp.toFixed(1)}°C jest bardzo dobra pod regularne brania.`);
+    } else if (temp >= 8 && temp <= 27) {
+      notes.push(`Temperatura ${temp.toFixed(1)}°C jest jeszcze sensowna, choć nie idealna.`);
+    } else {
+      notes.push(`Temperatura ${temp.toFixed(1)}°C może ograniczać aktywność ryb.`);
+    }
+
+    if (amplitude <= 6) {
+      notes.push(`Amplituda temperatury około ${amplitude.toFixed(1)}°C wygląda stabilnie i sprzyja spokojniejszym warunkom.`);
+    } else {
+      notes.push(`Amplituda temperatury około ${amplitude.toFixed(1)}°C jest dość duża, więc zachowanie ryb może się szybciej zmieniać.`);
+    }
+
+    if (wind >= 8 && wind <= 22) {
+      notes.push(`Wiatr ${wind.toFixed(1)} km/h wygląda korzystnie — pracuje na powierzchni i może poprawiać aktywność.`);
+    } else if (wind < 4) {
+      notes.push(`Wiatr ${wind.toFixed(1)} km/h jest słaby — woda może być zbyt spokojna.`);
+    } else if (wind > 30) {
+      notes.push(`Wiatr ${wind.toFixed(1)} km/h jest mocny i może utrudniać łowienie.`);
+    } else {
+      notes.push(`Wiatr ${wind.toFixed(1)} km/h jest neutralny.`);
+    }
+
+    if (gusts > 40) {
+      notes.push(`Porywy ${gusts.toFixed(1)} km/h są wysokie i mogą pogarszać kontrolę nad zestawem.`);
+    } else {
+      notes.push(`Porywy ${gusts.toFixed(1)} km/h nie powinny mocno przeszkadzać.`);
+    }
+
+    if (cloud >= 25 && cloud <= 85) {
+      notes.push(`Zachmurzenie ${Math.round(cloud)}% wygląda dobrze — światło jest bardziej miękkie, co bywa korzystne.`);
+    } else if (cloud < 20) {
+      notes.push(`Małe zachmurzenie (${Math.round(cloud)}%) oznacza sporo światła, więc ryby mogą być ostrożniejsze.`);
+    } else {
+      notes.push(`Duże zachmurzenie (${Math.round(cloud)}%) może pomagać, o ile nie towarzyszy temu załamanie pogody.`);
+    }
+
+    if (rain > 0 && rain <= 1.5) {
+      notes.push(`Lekki opad (${rain.toFixed(1)} mm) może działać na plus i pobudzać wodę.`);
+    } else if (rain > 4) {
+      notes.push(`Silniejszy opad (${rain.toFixed(1)} mm) może pogarszać komfort i rozbijać rytm łowienia.`);
+    } else {
+      notes.push("Brak istotnych opadów — warunki są spokojniejsze i bardziej stabilne.");
+    }
+
+    if (getHourWeightForBites(hour) === 2) {
+      notes.push("Aktualna pora dnia należy do najlepszych okien aktywności ryb.");
+    } else if (getHourWeightForBites(hour) === 1) {
+      notes.push("Pora dnia jest umiarkowanie dobra i warto pilnować sygnałów z wody.");
+    } else {
+      notes.push("To nie jest najmocniejsze okno aktywności — większe szanse mogą pojawić się rano lub wieczorem.");
+    }
+
+    return { notes, score: currentScore, label, amplitude };
+  }
+
+  function buildBestBiteWindow(data, currentIndex) {
+    const hourly = data.hourly;
+    const limit = Math.min(hourly.time.length, currentIndex + 24);
+
+    let best = null;
+    let worst = null;
+
+    for (let i = currentIndex; i < limit; i += 1) {
+      const hour = new Date(hourly.time[i]).getHours();
+      const snapshot = {
+        temperature_2m: hourly.temperature_2m[i],
+        wind_speed_10m: hourly.wind_speed_10m[i],
+        wind_gusts_10m: hourly.wind_gusts_10m[i],
+        pressure_msl: hourly.pressure_msl[i],
+        cloud_cover: hourly.cloud_cover[i],
+        precipitation: hourly.precipitation[i]
+      };
+
+      const trend = getPressureTrend(hourly.pressure_msl, i);
+      const score = getBiteScore(snapshot, trend, hour);
+
+      const item = {
+        index: i,
+        time: hourly.time[i],
+        score,
+        label: biteScoreToLabel(score)
+      };
+
+      if (!best || item.score > best.score) best = item;
+      if (!worst || item.score < worst.score) worst = item;
+    }
+
+    let activityTrend = "stabilna";
+    if (best && worst) {
+      if (best.index - currentIndex <= 6 && best.score - worst.score >= 2) activityTrend = "poprawa";
+      else if (worst.index - currentIndex <= 6 && worst.score < best.score) activityTrend = "pogorszenie";
+    }
+
+    return { best, worst, activityTrend };
+  }
+
+  function buildBiteTactic(score, bestWindow, current) {
+    const notes = [];
+    const wind = Number(current.wind_speed_10m || 0);
+    const rain = Number(current.precipitation || 0);
+    const cloud = Number(current.cloud_cover || 0);
+
+    if (score >= 10) {
+      notes.push("Warunki są bardzo mocne pod aktywność ryb — warto być gotowym na szybszą reakcję i częściej kontrolować zestawy.");
+      notes.push("To dobry moment na pełne skupienie na łowieniu, szczególnie w aktywnych godzinach.");
+    } else if (score >= 8) {
+      notes.push("Warunki są dobre — warto pilnować brań i nie odpuszczać bardziej perspektywicznych miejsc.");
+      notes.push("To sensowny czas na regularne dokładanie towaru i utrzymanie stanowiska w pracy.");
+    } else if (score >= 6) {
+      notes.push("Warunki są umiarkowanie dobre — łowić warto, ale trzeba bardziej liczyć na cierpliwość i poprawne podanie zestawu.");
+      notes.push("Najwięcej sensu ma polowanie na lepsze godziny i utrzymanie porządku w taktyce.");
+    } else {
+      notes.push("Warunki są słabsze — nastaw się bardziej na przeczekanie i wykorzystanie lepszego okna pogodowego.");
+      notes.push("Teraz kluczowa będzie cierpliwość, prostota i dobra obserwacja wody.");
+    }
+
+    if (wind >= 8 && wind <= 22) notes.push("Wiatr pracuje na plus, więc warto wykorzystać bardziej aktywną stronę wody.");
+    if (rain > 0 && rain <= 1.5) notes.push("Lekki opad może poprawić aktywność — dobrze zachować gotowość szczególnie przy zmianie światła.");
+    if (cloud < 20) notes.push("Przy małym zachmurzeniu warto liczyć się z ostrożniejszym zachowaniem ryb w pełnym świetle.");
+
+    if (bestWindow?.best) {
+      notes.push(`Najmocniejsze przewidywane okno aktywności: ${formatHour(bestWindow.best.time)} (${bestWindow.best.label}).`);
+    }
+
+    return notes;
+  }
+
   function setNotes(containerId, notes) {
     const container = $(containerId);
     if (!container) return;
     clearNode(container);
 
-    notes.forEach(note => {
+    notes.forEach((note) => {
       const item = el("div", "weather-note");
       item.appendChild(document.createTextNode(note));
       container.appendChild(item);
@@ -337,12 +571,17 @@
     const moon = moonPhaseInfo(new Date());
     const night = pickNearestNightWindow(hourly, currentIndex);
 
+    const biteAnalysis = buildBiteAnalysis(data, currentIndex);
+    const bestWindow = buildBestBiteWindow(data, currentIndex);
+    const biteTactic = buildBiteTactic(biteAnalysis.score, bestWindow, current);
+
     if ($("weather-current-condition-icon")) $("weather-current-condition-icon").textContent = icon;
     if ($("weather-summary-location")) $("weather-summary-location").textContent = spot.name || "Miejsce zasiadki";
     if ($("weather-summary-updated")) {
       $("weather-summary-updated").textContent = `Aktualizacja: ${new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}`;
     }
     if ($("weather-rating-hero")) $("weather-rating-hero").textContent = `Ocena: ${rating}`;
+    if ($("bite-chance-hero")) $("bite-chance-hero").textContent = `Brania: ${biteAnalysis.label}`;
 
     if ($("weather-current-temp")) $("weather-current-temp").textContent = `${Number(current.temperature_2m).toFixed(1)}°C`;
     if ($("weather-current-wind")) $("weather-current-wind").textContent = `${Number(current.wind_speed_10m).toFixed(1)} / ${Number(current.wind_gusts_10m).toFixed(1)} km/h`;
@@ -384,8 +623,35 @@
     if ($("wind-gusts-inline")) $("wind-gusts-inline").textContent = `${Number(current.wind_gusts_10m || 0).toFixed(1)} km/h`;
     if ($("wind-score-inline")) $("wind-score-inline").textContent = rating;
 
+    if ($("bite-chance-main")) $("bite-chance-main").textContent = biteAnalysis.label;
+    if ($("bite-score-note")) $("bite-score-note").textContent = `Punktacja: ${biteAnalysis.score}`;
+    if ($("best-bite-window")) $("best-bite-window").textContent = bestWindow.best ? formatHour(bestWindow.best.time) : "--";
+    if ($("best-bite-window-note")) $("best-bite-window-note").textContent = bestWindow.best ? `Ocena: ${bestWindow.best.label}` : "Brak danych";
+    if ($("bite-trend")) {
+      $("bite-trend").textContent =
+        bestWindow.activityTrend === "poprawa"
+          ? "Poprawa"
+          : bestWindow.activityTrend === "pogorszenie"
+            ? "Pogorszenie"
+            : "Stabilnie";
+    }
+    if ($("bite-trend-note")) {
+      $("bite-trend-note").textContent =
+        bestWindow.activityTrend === "poprawa"
+          ? "Najbliższe godziny wyglądają lepiej"
+          : bestWindow.activityTrend === "pogorszenie"
+            ? "Warunki mogą osłabnąć"
+            : "Bez dużych zmian";
+    }
+    if ($("bite-tactic-short")) $("bite-tactic-short").textContent = biteScoreToShortTactic(biteAnalysis.score);
+    if ($("bite-tactic-note")) {
+      $("bite-tactic-note").textContent = bestWindow.best ? `Pilnuj szczególnie około ${formatHour(bestWindow.best.time)}` : "Obserwuj wodę";
+    }
+
     setNotes("weather-interpretation", buildWeatherInterpretation(current, hourly, currentIndex));
     setNotes("camp-interpretation", buildCampInterpretation(night, moon));
+    setNotes("bite-analysis", biteAnalysis.notes);
+    setNotes("bite-tactic-box", biteTactic);
   }
 
   function createWeatherChip(label, value, highlight = false) {
@@ -415,17 +681,30 @@
       title.appendChild(icon);
       title.appendChild(textWrap);
 
-      const rating = el("div", "section-chip", `${Number(data.hourly.temperature_2m[i]).toFixed(1)}°C`);
+      const trend = getPressureTrend(data.hourly.pressure_msl, i);
+      const hour = new Date(data.hourly.time[i]).getHours();
+      const biteScore = getBiteScore({
+        temperature_2m: data.hourly.temperature_2m[i],
+        wind_speed_10m: data.hourly.wind_speed_10m[i],
+        wind_gusts_10m: data.hourly.wind_gusts_10m[i],
+        pressure_msl: data.hourly.pressure_msl[i],
+        cloud_cover: data.hourly.cloud_cover[i],
+        precipitation: data.hourly.precipitation[i]
+      }, trend, hour);
+
+      const rating = el("div", "section-chip", `${biteScoreToLabel(biteScore)}`);
       top.appendChild(title);
       top.appendChild(rating);
       card.appendChild(top);
 
       const grid = el("div", "weather-chip-grid");
       grid.appendChild(createWeatherChip("🌡️ Temp.", `${Number(data.hourly.temperature_2m[i]).toFixed(1)}°C`, true));
+      grid.appendChild(createWeatherChip("🐟 Brania", biteScoreToLabel(biteScore), true));
       grid.appendChild(createWeatherChip("🌬️ Wiatr", `${Number(data.hourly.wind_speed_10m[i]).toFixed(1)} km/h`));
       grid.appendChild(createWeatherChip("💨 Porywy", `${Number(data.hourly.wind_gusts_10m[i]).toFixed(1)} km/h`));
       grid.appendChild(createWeatherChip("🧭 Kierunek", windDirectionToText(data.hourly.wind_direction_10m[i])));
       grid.appendChild(createWeatherChip("🧭 Ciśnienie", `${Number(data.hourly.pressure_msl[i]).toFixed(0)} hPa`));
+      grid.appendChild(createWeatherChip("📈 Trend", trend));
       grid.appendChild(createWeatherChip("🌧️ Opad", `${Number(data.hourly.precipitation[i] || 0).toFixed(1)} mm`));
       grid.appendChild(createWeatherChip("☁️ Chmury", `${Math.round(Number(data.hourly.cloud_cover[i] || 0))}%`));
       grid.appendChild(createWeatherChip("💧 Wilgotność", `${Math.round(Number(data.hourly.relative_humidity_2m[i] || 0))}%`));
@@ -478,7 +757,7 @@
     if (!$("weather-current-temp")) return;
 
     try {
-      if ($("weather-current-temp")) $("weather-current-temp").textContent = "Ładowanie...";
+      $("weather-current-temp").textContent = "Ładowanie...";
       const data = await fetchWeatherDataEnhanced();
       renderCurrentWeatherEnhanced(data);
       renderHourlyWeatherEnhanced(data);
@@ -491,13 +770,19 @@
         "weather-current-pressure",
         "weather-rating",
         "weather-description",
-        "weather-description-copy"
+        "weather-description-copy",
+        "bite-chance-main",
+        "best-bite-window",
+        "bite-trend",
+        "bite-tactic-short"
       ];
-      ids.forEach(id => {
+      ids.forEach((id) => {
         if ($(id)) $(id).textContent = "Błąd";
       });
       setNotes("weather-interpretation", ["Nie udało się pobrać danych pogodowych."]);
       setNotes("camp-interpretation", ["Brak danych do oceny obozowania."]);
+      setNotes("bite-analysis", ["Brak danych do analizy brań."]);
+      setNotes("bite-tactic-box", ["Brak danych do rekomendacji."]);
     }
   }
 

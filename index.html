@@ -21,16 +21,22 @@
         </div>
       </div>
 
-      <nav class="main-nav">
-        <a href="index.html" class="active">Dashboard</a>
-        <a href="pages/polowy.html">Połowy</a>
-        <a href="pages/pogoda.html">Pogoda PRO</a>
-        <a href="pages/wezly.html">Węzły</a>
-        <a href="pages/rigi.html">Rigi</a>
-        <a href="pages/checklisty.html">Checklisty</a>
-        <a href="pages/mapa.html">Mapa spotów / dna</a>
-        <a href="pages/porady.html">Porady</a>
-      </nav>
+      <div class="mobile-nav-wrap">
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+          ☰ Menu
+        </button>
+
+        <nav class="main-nav" id="main-nav">
+          <a href="index.html" class="active">Dashboard</a>
+          <a href="pages/polowy.html">Połowy</a>
+          <a href="pages/pogoda.html">Pogoda PRO</a>
+          <a href="pages/wezly.html">Węzły</a>
+          <a href="pages/rigi.html">Rigi</a>
+          <a href="pages/checklisty.html">Checklisty</a>
+          <a href="pages/mapa.html">Mapa spotów / dna</a>
+          <a href="pages/porady.html">Porady</a>
+        </nav>
+      </div>
     </div>
   </header>
 
@@ -39,8 +45,7 @@
       <div>
         <h2>Panel główny wyjazdu</h2>
         <p>
-          To będzie główne centrum dowodzenia dla wyjazdu Ryby 2026:
-          połowy, statystyki, pogoda, węzły, rigi, checklisty i mapa spotów.
+          Centrum dowodzenia dla wyjazdu Ryby 2026: połowy, statystyki, pogoda, węzły, rigi, checklisty i mapa spotów.
         </p>
       </div>
     </section>
@@ -64,6 +69,26 @@
       <article class="stat-card">
         <span class="label">Najlepszy spot ogólnie</span>
         <strong id="best-spot">Brak danych</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Najlepsza przynęta</span>
+        <strong id="best-bait-global">Brak danych</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Najlepsza pora brań</span>
+        <strong id="best-hour-global">Brak danych</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Liczba spotów</span>
+        <strong id="spots-count-dashboard">0</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Odhaczone checklisty</span>
+        <strong id="checklist-done-dashboard">0</strong>
       </article>
     </section>
 
@@ -132,7 +157,8 @@
       </article>
     </section>
   </main>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

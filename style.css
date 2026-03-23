@@ -818,3 +818,57 @@ button:hover {
   color: var(--muted);
   font-size: 0.88rem;
 }
+
+/* === READY FIXES === */
+.menu-toggle {
+  display: none;
+}
+
+.spot-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .mobile-nav-wrap {
+    display: block;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    width: 100%;
+    background: var(--bg-soft);
+    color: var(--text);
+  }
+
+  .main-nav {
+    display: none;
+    gap: 8px;
+    padding: 0 0 14px;
+    overflow: visible;
+  }
+
+  .main-nav.open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-nav a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .spot-actions,
+  .inline-actions {
+    width: 100%;
+  }
+
+  .spot-actions button,
+  .inline-actions button {
+    width: 100%;
+  }
+}

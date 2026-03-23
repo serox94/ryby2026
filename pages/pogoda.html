@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ryby 2026 | Pogoda PRO</title>
   <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../weather-plus.css" />
 </head>
 <body>
   <header class="site-header">
@@ -42,115 +43,185 @@
   </header>
 
   <main class="container page-content">
-    <section class="hero-card">
-      <div>
-        <h2>Pogoda PRO</h2>
-        <p>
-          Warunki pod brania i obozowanie: temperatura, wiatr, porywy, ciśnienie, trend, wilgotność, punkt rosy,
-          zachmurzenie, opady, widzialność, UV, gleba, słońce i faza księżyca.
-        </p>
+    <section class="hero-card weather-hero">
+      <div class="weather-hero-main">
+        <div class="weather-hero-icon" id="weather-current-condition-icon" aria-hidden="true">⛅</div>
+
+        <div>
+          <div class="eyebrow">🌦️ Pogoda i warunki na zasiadkę</div>
+          <h2>Pogoda PRO</h2>
+          <p>
+            Warunki pod brania i obozowanie: temperatura, wiatr, porywy, ciśnienie, trend, wilgotność, punkt rosy,
+            zachmurzenie, opady, widzialność, UV, gleba, słońce i faza księżyca.
+          </p>
+
+          <div class="weather-hero-pills">
+            <span class="hero-pill">📍 <span id="weather-summary-location">Miejsce zasiadki</span></span>
+            <span class="hero-pill">🕒 <span id="weather-summary-updated">Ładowanie danych...</span></span>
+            <span class="hero-pill">🎣 <span id="weather-rating-hero">Ocena: --</span></span>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="stats-grid weather-top-grid">
-      <article class="stat-card">
-        <span class="label">Temperatura teraz</span>
+      <article class="stat-card weather-stat-card">
+        <span class="label">🌡️ Temperatura teraz</span>
         <strong id="weather-current-temp">--</strong>
+        <small id="weather-description" class="weather-stat-sub">--</small>
       </article>
 
-      <article class="stat-card">
-        <span class="label">Wiatr / porywy</span>
+      <article class="stat-card weather-stat-card">
+        <span class="label">🌬️ Wiatr / porywy</span>
         <strong id="weather-current-wind">--</strong>
+        <small id="weather-wind-direction" class="weather-stat-sub">--</small>
       </article>
 
-      <article class="stat-card">
-        <span class="label">Ciśnienie / trend</span>
+      <article class="stat-card weather-stat-card">
+        <span class="label">🧭 Ciśnienie / trend</span>
         <strong id="weather-current-pressure">--</strong>
+        <small id="weather-pressure-note" class="weather-stat-sub">Trend i stabilność</small>
       </article>
 
-      <article class="stat-card">
-        <span class="label">Ocena warunków</span>
+      <article class="stat-card weather-stat-card weather-score-card">
+        <span class="label">🎣 Ocena warunków</span>
         <strong id="weather-rating">--</strong>
+        <small id="weather-rating-note" class="weather-stat-sub">Analiza pod brania</small>
+      </article>
+    </section>
+
+    <section class="two-column weather-main-grid">
+      <article class="panel-card">
+        <div class="section-head">
+          <h3>🎣 Brania — teraz</h3>
+          <span class="section-chip">live</span>
+        </div>
+
+        <div class="mini-stats">
+          <div><span>☁️ Opis</span><strong id="weather-description-copy">--</strong></div>
+          <div><span>🌡️ Odczuwalna</span><strong id="weather-apparent-temp">--</strong></div>
+          <div><span>🧭 Kierunek wiatru</span><strong id="weather-wind-direction-copy">--</strong></div>
+          <div><span>☁️ Zachmurzenie</span><strong id="weather-cloud-cover">--</strong></div>
+          <div><span>🌧️ Opad</span><strong id="weather-precipitation">--</strong></div>
+          <div><span>💧 Wilgotność</span><strong id="weather-humidity">--</strong></div>
+          <div><span>🌫️ Punkt rosy</span><strong id="weather-dew-point">--</strong></div>
+          <div><span>👀 Widzialność</span><strong id="weather-visibility">--</strong></div>
+          <div><span>☀️ UV</span><strong id="weather-uv">--</strong></div>
+          <div><span>🌞 Nasłonecznienie dziś</span><strong id="weather-sunshine">--</strong></div>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <div class="section-head">
+          <h3>🌙 Obozowanie / noc</h3>
+          <span class="section-chip">noc</span>
+        </div>
+
+        <div class="mini-stats">
+          <div><span>🌡️ Temperatura nocą</span><strong id="camp-night-temp">--</strong></div>
+          <div><span>🌬️ Wiatr nocą</span><strong id="camp-night-wind">--</strong></div>
+          <div><span>💨 Porywy nocą</span><strong id="camp-night-gusts">--</strong></div>
+          <div><span>💧 Wilgotność nocą</span><strong id="camp-night-humidity">--</strong></div>
+          <div><span>🌫️ Mgła / widzialność</span><strong id="camp-night-visibility">--</strong></div>
+          <div><span>🏕️ Komfort nocny</span><strong id="camp-night-rating">--</strong></div>
+          <div><span>🌕 Faza księżyca</span><strong id="moon-phase">--</strong></div>
+          <div><span>✨ Oświetlenie księżyca</span><strong id="moon-illumination">--</strong></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="two-column">
+      <article class="panel-card weather-wind-card">
+        <div class="section-head">
+          <h3>🧭 Wskaźnik wiatru</h3>
+          <span class="section-chip" id="wind-compass-text">--</span>
+        </div>
+
+        <div class="wind-compass-wrap">
+          <div class="wind-compass">
+            <div class="wind-compass-center"></div>
+            <div class="wind-compass-ring"></div>
+            <div class="wind-compass-label north">N</div>
+            <div class="wind-compass-label east">E</div>
+            <div class="wind-compass-label south">S</div>
+            <div class="wind-compass-label west">W</div>
+            <div class="wind-arrow" id="wind-arrow"></div>
+          </div>
+
+          <div class="wind-legend">
+            <div class="wind-legend-item">
+              <span>🌬️ Kierunek</span>
+              <strong id="wind-direction-long">--</strong>
+            </div>
+            <div class="wind-legend-item">
+              <span>🚀 Porywy</span>
+              <strong id="wind-gusts-inline">--</strong>
+            </div>
+            <div class="wind-legend-item">
+              <span>🎯 Ocena</span>
+              <strong id="wind-score-inline">--</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <div class="section-head">
+          <h3>🌱 Gleba i warunki przy brzegu</h3>
+          <span class="section-chip">brzeg</span>
+        </div>
+
+        <div class="mini-stats">
+          <div><span>🌡️ Temp. gleby 0–10 cm</span><strong id="soil-temp">--</strong></div>
+          <div><span>💦 Wilgotność gleby 0–10 cm</span><strong id="soil-moisture">--</strong></div>
+        </div>
+
+        <div class="shore-note">
+          Najlepsza użyteczność tej sekcji: szybka ocena komfortu stanowiska, porannej rosy, miękkiego gruntu
+          i tego, czy nocą może zrobić się nieprzyjemnie przy brzegu.
+        </div>
       </article>
     </section>
 
     <section class="two-column">
       <article class="panel-card">
-        <h3>Brania — teraz</h3>
-        <div class="mini-stats">
-          <div><span>Opis</span><strong id="weather-description">--</strong></div>
-          <div><span>Odczuwalna</span><strong id="weather-apparent-temp">--</strong></div>
-          <div><span>Kierunek wiatru</span><strong id="weather-wind-direction">--</strong></div>
-          <div><span>Zachmurzenie</span><strong id="weather-cloud-cover">--</strong></div>
-          <div><span>Opad</span><strong id="weather-precipitation">--</strong></div>
-          <div><span>Wilgotność</span><strong id="weather-humidity">--</strong></div>
-          <div><span>Punkt rosy</span><strong id="weather-dew-point">--</strong></div>
-          <div><span>Widzialność</span><strong id="weather-visibility">--</strong></div>
-          <div><span>UV</span><strong id="weather-uv">--</strong></div>
-          <div><span>Nasłonecznienie dziś</span><strong id="weather-sunshine">--</strong></div>
+        <div class="section-head">
+          <h3>🧠 Interpretacja pod brania</h3>
+          <span class="section-chip">analiza</span>
         </div>
-      </article>
-
-      <article class="panel-card">
-        <h3>Obozowanie / noc</h3>
-        <div class="mini-stats">
-          <div><span>Temperatura nocą</span><strong id="camp-night-temp">--</strong></div>
-          <div><span>Wiatr nocą</span><strong id="camp-night-wind">--</strong></div>
-          <div><span>Porywy nocą</span><strong id="camp-night-gusts">--</strong></div>
-          <div><span>Wilgotność nocą</span><strong id="camp-night-humidity">--</strong></div>
-          <div><span>Mgła / widzialność</span><strong id="camp-night-visibility">--</strong></div>
-          <div><span>Komfort nocny</span><strong id="camp-night-rating">--</strong></div>
-          <div><span>Faza księżyca</span><strong id="moon-phase">--</strong></div>
-          <div><span>Oświetlenie księżyca</span><strong id="moon-illumination">--</strong></div>
-        </div>
-      </article>
-    </section>
-
-    <section class="two-column">
-      <article class="panel-card">
-        <h3>Interpretacja pod brania</h3>
         <div id="weather-interpretation" class="weather-interpretation">
           Ładowanie interpretacji...
         </div>
       </article>
 
       <article class="panel-card">
-        <h3>Wniosek dla obozowania</h3>
+        <div class="section-head">
+          <h3>🏕️ Wniosek dla obozowania</h3>
+          <span class="section-chip">komfort</span>
+        </div>
         <div id="camp-interpretation" class="weather-interpretation">
           Ładowanie interpretacji...
         </div>
       </article>
     </section>
 
-    <section class="two-column">
-      <article class="panel-card">
-        <h3>Gleba i warunki przy brzegu</h3>
-        <div class="mini-stats">
-          <div><span>Temp. gleby 0–10 cm</span><strong id="soil-temp">--</strong></div>
-          <div><span>Wilgotność gleby 0–10 cm</span><strong id="soil-moisture">--</strong></div>
-        </div>
-      </article>
-
-      <article class="panel-card">
-        <div class="section-head">
-          <h3>Odśwież</h3>
-          <button id="refresh-weather-btn" type="button" class="secondary-btn">Pobierz pogodę</button>
-        </div>
-        <div class="empty-box">
-          Ta zakładka jest nastawiona na decyzję: czy warunki sprzyjają braniom, czy noc będzie komfortowa i czy warto pilnować zmian frontu.
-        </div>
-      </article>
-    </section>
-
     <section class="panel-card">
-      <h3>Prognoza godzinowa — najbliższe 24h</h3>
+      <div class="section-head">
+        <h3>⏱️ Prognoza godzinowa — najbliższe 24h</h3>
+        <button id="refresh-weather-btn" type="button" class="secondary-btn">🔄 Pobierz pogodę</button>
+      </div>
+
       <div id="weather-hourly-list" class="weather-hourly-list">
         <div class="empty-box">Ładowanie prognozy godzinowej...</div>
       </div>
     </section>
 
     <section class="panel-card">
-      <h3>Prognoza dzienna — najbliższe 7 dni</h3>
+      <div class="section-head">
+        <h3>📅 Prognoza dzienna — najbliższe 7 dni</h3>
+        <span class="section-chip">7 dni</span>
+      </div>
+
       <div id="weather-daily-list" class="weather-daily-list">
         <div class="empty-box">Ładowanie prognozy dziennej...</div>
       </div>
@@ -159,5 +230,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../app.js"></script>
+  <script src="../fixes.js"></script>
 </body>
 </html>

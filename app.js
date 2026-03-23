@@ -417,6 +417,200 @@ function bindCatchesPageEvents() {
   }
 }
 
+// CHECKLISTY
+
+function setChecklistMessage(message, type = "") {
+  const box = document.getElementById("checklist-message");
+  if (!box) return;
+
+  box.textContent = message;
+  box.className = "form-message";
+  if (type) box.classList.add(type);
+}
+
+function validateChecklistForm(values) {
+  if (!values.category) return "Wybierz kategorię.";
+  if (!values.item_name.trim()) return "Podaj nazwę pozycji.";
+  return null;
+}
+
+async function handleChecklistSubmit(event) {
+  event.preventDefault();
+
+  const values = {
+    category: document.getElementById("check-category")?.value || "",
+    item_name: document.getElementById("check-name")?.value || "",
+    quantity: document.getElementById("check-quantity")?.value || "",
+    unit: document.getElementById("check-unit")?.value || "szt."
+  };
+
+  const validationError = validateChecklistForm(values);
+  if (validationError) {
+    setChecklistMessage(validationError, "error");
+    return;
+  }
+
+  setChecklistMessage("Zapisywanie pozycji...");
+
+  const payload = {
+    category: values.category.trim(),
+    item_name: values.item_name.trim(),
+    quantity: values.quantity ? Number(values.quantity) : null,
+    unit: values.unit
+  };
+
+  const { error } = await supabaseClient
+    .from("checklist_items")
+    .insert([payload]);
+
+  if (error) {
+    console.error("Błąd dodawania checklisty:", error);
+    setChecklistMessage("Nie udało się dodać pozycji.", "error");
+    return;
+  }
+
+  setChecklistMessage("Pozycja została dodana.", "success");
+  document.getElementById("checklist-form")?.reset();
+  await renderChecklistPage();
+}
+
+async function toggleChecklistItem(id, currentState) {
+  const { error } = await supabaseClient
+    .from("checklist_items")
+    .update({ done: !currentState })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Błąd zmiany statusu checklisty:", error);
+    alert("Nie udało się zmienić statusu.");
+    return;
+  }
+
+  await renderChecklistPage();
+}
+
+async function deleteChecklistItem(id) {
+  const confirmed = window.confirm("Usunąć tę pozycję?");
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from("checklist_items")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Błąd usuwania checklisty:", error);
+    alert("Nie udało się usunąć pozycji.");
+    return;
+  }
+
+  await renderChecklistPage();
+}
+
+async function loadChecklistFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("checklist_items")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Błąd pobierania checklist:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+function renderChecklistSummary(items) {
+  const allCount = items.length;
+  const doneCount = items.filter(item => item.done).length;
+  const openCount = allCount - doneCount;
+
+  const allEl = document.getElementById("check-all-count");
+  if (!allEl) return;
+
+  document.getElementById("check-all-count").textContent = allCount;
+  document.getElementById("check-done-count").textContent = doneCount;
+  document.getElementById("check-open-count").textContent = openCount;
+}
+
+function groupChecklistItems(items) {
+  return {
+    "sprzęt": items.filter(item => item.category === "sprzęt"),
+    "zakupy": items.filter(item => item.category === "zakupy"),
+    "jedzenie / picie": items.filter(item => item.category === "jedzenie / picie")
+  };
+}
+
+function renderChecklistGroups(items) {
+  const container = document.getElementById("checklist-groups");
+  if (!container) return;
+
+  if (!items.length) {
+    container.innerHTML = `<div class="empty-box">Brak pozycji na liście.</div>`;
+    return;
+  }
+
+  const groups = groupChecklistItems(items);
+
+  container.innerHTML = Object.entries(groups).map(([groupName, groupItems]) => {
+    if (!groupItems.length) return "";
+
+    return `
+      <section class="checklist-group">
+        <h4>${groupName}</h4>
+        <div class="checklist-items">
+          ${groupItems.map(item => `
+            <div class="check-item-row">
+              <div class="check-item-left">
+                <input
+                  type="checkbox"
+                  ${item.done ? "checked" : ""}
+                  onchange="toggleChecklistItem(${item.id}, ${item.done})"
+                />
+                <div class="check-item-content">
+                  <div class="check-item-title ${item.done ? "done" : ""}">
+                    ${item.item_name}
+                  </div>
+                  <div class="check-item-meta">
+                    ${item.quantity !== null && item.quantity !== undefined ? `${item.quantity} ${item.unit}` : `bez ilości`}
+                  </div>
+                </div>
+              </div>
+
+              <div class="check-item-actions">
+                <button class="danger-btn" onclick="deleteChecklistItem(${item.id})">Usuń</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }).join("");
+}
+
+async function renderChecklistPage() {
+  const container = document.getElementById("checklist-groups");
+  if (!container) return;
+
+  container.innerHTML = `<div class="empty-box">Ładowanie checklist...</div>`;
+  const items = await loadChecklistFromSupabase();
+  renderChecklistSummary(items);
+  renderChecklistGroups(items);
+}
+
+function bindChecklistPageEvents() {
+  const form = document.getElementById("checklist-form");
+  if (form) {
+    form.addEventListener("submit", handleChecklistSubmit);
+  }
+
+  const refreshBtn = document.getElementById("refresh-checklist-btn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", renderChecklistPage);
+  }
+}
+
 async function initDashboardPage() {
   updateCountdown();
   setupMobileMenu();
@@ -435,8 +629,17 @@ async function initCatchesPage() {
   setInterval(updateCountdown, 30000);
 }
 
+async function initChecklistPage() {
+  updateCountdown();
+  setupMobileMenu();
+  bindChecklistPageEvents();
+  await renderChecklistPage();
+  setInterval(updateCountdown, 30000);
+}
+
 const isDashboardPage = document.getElementById("total-weight");
 const isCatchesPage = document.getElementById("catch-form");
+const isChecklistPage = document.getElementById("checklist-form");
 
 if (isDashboardPage) {
   initDashboardPage();
@@ -446,4 +649,10 @@ if (isCatchesPage) {
   initCatchesPage();
 }
 
+if (isChecklistPage) {
+  initChecklistPage();
+}
+
 window.deleteCatch = deleteCatch;
+window.toggleChecklistItem = toggleChecklistItem;
+window.deleteChecklistItem = deleteChecklistItem;

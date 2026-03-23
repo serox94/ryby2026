@@ -46,16 +46,18 @@
       <div>
         <h2>Checklisty</h2>
         <p>
-          Wspólna lista rzeczy do zabrania, kupienia i ogarnięcia przed wyjazdem.
+          Wspólna lista rzeczy do zabrania, kupienia i ogarnięcia przed wyjazdem. Edycja i zmiany na żywo.
         </p>
       </div>
     </section>
 
     <section class="two-column">
       <article class="panel-card">
-        <h3>Dodaj pozycję</h3>
+        <h3 id="checklist-form-title">Dodaj pozycję</h3>
 
         <form id="checklist-form" class="form-grid">
+          <input type="hidden" id="edit-check-id" />
+
           <div class="form-row">
             <div>
               <label for="check-category">Kategoria</label>
@@ -89,7 +91,8 @@
           </div>
 
           <div class="form-actions">
-            <button type="submit">Dodaj pozycję</button>
+            <button type="submit" id="save-check-btn">Dodaj pozycję</button>
+            <button type="button" id="cancel-edit-check-btn" class="secondary-btn hidden">Anuluj edycję</button>
           </div>
 
           <div id="checklist-message" class="form-message" aria-live="polite"></div>

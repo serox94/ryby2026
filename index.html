@@ -1,305 +1,138 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TACTICAL COMMAND V10 | STEK 2 PRO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --neon-green: #00ff88; --neon-blue: #00d2ff; --danger: #ff4757;
-            --accent: #ffb800; --bg-dark: #0a0c0f; --glass: rgba(16, 20, 24, 0.98);
-        }
-        body {
-            margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: #fff;
-            background-image: radial-gradient(circle at 5% 5%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
-            min-height: 100vh; padding-bottom: 70px; overflow-x: hidden;
-        }
-        header { padding: 20px; text-align: center; border-bottom: 1px solid var(--neon-green); background: rgba(0,0,0,0.8); sticky: top; z-index: 1000; }
-        .header-title { font-family: 'Orbitron'; font-size: 1.4rem; letter-spacing: 2px; color: var(--neon-green); margin: 0; }
-        
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 15px; padding: 15px; max-width: 1600px; margin: auto; }
-        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.05); border-top: 2px solid var(--neon-blue); border-radius: 8px; padding: 18px; }
-        h2 { font-family: 'Orbitron'; font-size: 0.85rem; color: var(--neon-blue); margin-top: 0; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
-
-        /* Pogoda PRO */
-        .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .w-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px; text-align: center; border: 1px solid #222; }
-        .w-val { font-weight: 800; color: var(--accent); font-size: 1.1rem; }
-        .w-label { font-size: 0.65rem; color: #888; text-transform: uppercase; }
-        .recom-box { margin-top: 15px; padding: 12px; border-radius: 4px; font-size: 0.8rem; line-height: 1.4; border-left: 4px solid var(--neon-green); background: rgba(0, 255, 136, 0.05); }
-
-        /* Tabs Logic */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Navigation */
-        nav { position: fixed; bottom: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 2000; }
-        .nav-btn { color: #555; text-decoration: none; font-size: 0.65rem; text-align: center; flex: 1; }
-        .nav-btn.active { color: var(--neon-green); }
-        .nav-btn i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
-
-        /* Stats */
-        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.8rem; }
-        .stat-val { color: var(--neon-green); font-weight: bold; }
-
-        /* Forms */
-        input, select, button { width: 100%; padding: 10px; margin: 4px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
-        button { background: var(--neon-green); color: #000; font-weight: 800; cursor: pointer; border: none; }
-        .btn-del { background: var(--danger); color: #fff; width: 25px; height: 25px; padding: 0; margin: 0; }
-
-        /* Rigs */
-        .rig-card { background: rgba(255,255,255,0.02); padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #333; }
-        .rig-title { color: var(--neon-blue); font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
-        .rig-desc { font-size: 0.75rem; color: #aaa; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ryby 2026 | Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<header>
-    <div class="header-title">STEK 2 COMMAND</div>
-    <div id="countdown" style="font-size: 0.7rem; color: var(--accent); margin-top:5px;">Inicjalizacja systemu...</div>
-</header>
-
-<div class="dashboard">
-
-    <div id="tab-home" class="tab-content active">
-        <div class="card">
-            <h2><i class="fas fa-chart-pie"></i> Analityka Duetu</h2>
-            <div id="duo-stats">
-                </div>
-            <div style="margin-top:15px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="w-item"><div class="w-label">Twoja Suma</div><div class="w-val" id="sum-patryk">0 kg</div></div>
-                <div class="w-item"><div class="w-label">Suma Maćka</div><div class="w-val" id="sum-maciek">0 kg</div></div>
-            </div>
+  <header class="site-header">
+    <div class="container">
+      <div class="header-top">
+        <div>
+          <h1>Ryby 2026</h1>
+          <p class="subtitle">LodgingCarp – La Plaine des Bois 2</p>
         </div>
-
-        <div class="card" style="border-top-color: var(--neon-green);">
-            <h2><i class="fas fa-plus-circle"></i> Loguj Rybę</h2>
-            <select id="fisher"><option value="Patryk">Patryk</option><option value="Maciek">Maciek</option></select>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                <input type="text" id="spec" placeholder="Gatunek">
-                <input type="number" step="0.1" id="wgt" placeholder="Waga kg">
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                <input type="text" id="bait" placeholder="Przynęta">
-                <input type="number" id="spot" placeholder="Spot #">
-            </div>
-            <button onclick="addFish()">REJESTRUJ POŁÓW</button>
-            <div id="catch-list" style="margin-top:15px; max-height: 250px; overflow-y:auto;"></div>
+        <div class="trip-box">
+          <div><strong>Wyjazd:</strong> 20.06.2026, 14:00</div>
+          <div><strong>Powrót:</strong> 27.06.2026, 10:00</div>
+          <div id="countdown"><strong>Status:</strong> ładowanie...</div>
         </div>
+      </div>
+
+      <nav class="main-nav">
+        <a href="index.html" class="active">Dashboard</a>
+        <a href="pages/polowy.html">Połowy</a>
+        <a href="pages/pogoda.html">Pogoda PRO</a>
+        <a href="pages/wezly.html">Węzły</a>
+        <a href="pages/rigi.html">Rigi</a>
+        <a href="pages/checklisty.html">Checklisty</a>
+        <a href="pages/mapa.html">Mapa spotów / dna</a>
+        <a href="pages/porady.html">Porady</a>
+      </nav>
     </div>
+  </header>
 
-    <div id="tab-weather" class="tab-content">
-        <div class="card" style="border-top-color: var(--accent);">
-            <h2><i class="fas fa-wind"></i> Pogoda PRO (Coullons)</h2>
-            <div id="weather-pro-box">Ładowanie danych Open-Meteo...</div>
-            <div id="weather-interpretation" class="recom-box">Analizowanie warunków...</div>
-            <div class="weather-grid" id="hourly-forecast">
-                </div>
+  <main class="container page-content">
+    <section class="hero-card">
+      <div>
+        <h2>Panel główny wyjazdu</h2>
+        <p>
+          To będzie główne centrum dowodzenia dla wyjazdu Ryby 2026:
+          połowy, statystyki, pogoda, węzły, rigi, checklisty i mapa spotów.
+        </p>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="label">Łącznie złowiono</span>
+        <strong id="total-weight">0.0 kg</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Liczba ryb</span>
+        <strong id="total-fish">0</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Największa ryba wyjazdu</span>
+        <strong id="biggest-fish">Brak danych</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="label">Najlepszy spot ogólnie</span>
+        <strong id="best-spot">Brak danych</strong>
+      </article>
+    </section>
+
+    <section class="two-column">
+      <article class="panel-card">
+        <h3>Patryk</h3>
+
+        <div class="mini-stats">
+          <div><span>Największa ryba</span><strong id="patryk-biggest">0.0 kg</strong></div>
+          <div><span>Łącznie kg</span><strong id="patryk-total">0.0 kg</strong></div>
+          <div><span>Liczba ryb</span><strong id="patryk-count">0</strong></div>
+          <div><span>Najlepsza przynęta</span><strong id="patryk-bait">Brak</strong></div>
+          <div><span>Najlepszy spot</span><strong id="patryk-spot">Brak</strong></div>
         </div>
-    </div>
 
-    <div id="tab-rigs" class="tab-content">
-        <div class="card">
-            <h2><i class="fas fa-book-open"></i> Encyklopedia Taktyczna</h2>
-            <div class="rig-card">
-                <div class="rig-title">Ronnie Rig (Spinner Rig)</div>
-                <div class="rig-desc">Idealny na Pop-upy blisko dna. Niesamowita rotacja haka. Stosuj na twardym dnie.</div>
-            </div>
-            <div class="rig-card">
-                <div class="rig-title">Chod Rig</div>
-                <div class="rig-desc">Król zamulonego dna i roślinności. Przynęta zawsze prezentuje się nad brudem.</div>
-            </div>
-            <div class="rig-card">
-                <div class="rig-title">D-Rig (Wafters)</div>
-                <div class="rig-desc">Najlepsza prezentacja waftersa. Bardzo trudny do wyplucia przez karpia.</div>
-            </div>
-            <div class="rig-card">
-                <div class="rig-title">Węzeł Bez Węzła (Knotless)</div>
-                <div class="rig-desc">Podstawa każdego przyponu włosowego. Pamiętaj: żyłka musi wychodzić od strony ostrza!</div>
-            </div>
+        <div class="pb-section">
+          <div class="pb-top">
+            <span>PB do pobicia: 20 kg</span>
+            <span id="patryk-pb-text">0.0 kg</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="patryk-pb-bar"></div>
+          </div>
         </div>
-    </div>
+      </article>
 
-    <div id="tab-check" class="tab-content">
-        <div class="card" style="border-top-color: var(--neon-green);">
-            <h2><i class="fas fa-tasks"></i> Logistyka Operacji</h2>
-            <select id="check-selector" onchange="renderChecklists()">
-                <option value="pack">📦 Sprzęt (Wędy, Biwi, Akcesoria)</option>
-                <option value="shop">🛒 Zakupy (Zanęta, Chemia)</option>
-                <option value="food">🍱 Jedzenie & Picie</option>
-            </select>
-            <div style="display:flex; gap:5px; margin-top:10px;">
-                <input type="text" id="new-item" placeholder="Nazwa przedmiotu">
-                <input type="text" id="new-unit" placeholder="ilość/jedn." style="width:80px;">
-                <button onclick="addItem()" style="width:40px;">+</button>
-            </div>
-            <div id="check-list-container" style="margin-top:15px;"></div>
+      <article class="panel-card">
+        <h3>Maciek</h3>
+
+        <div class="mini-stats">
+          <div><span>Największa ryba</span><strong id="maciek-biggest">0.0 kg</strong></div>
+          <div><span>Łącznie kg</span><strong id="maciek-total">0.0 kg</strong></div>
+          <div><span>Liczba ryb</span><strong id="maciek-count">0</strong></div>
+          <div><span>Najlepsza przynęta</span><strong id="maciek-bait">Brak</strong></div>
+          <div><span>Najlepszy spot</span><strong id="maciek-spot">Brak</strong></div>
         </div>
-    </div>
 
-</div>
+        <div class="pb-section">
+          <div class="pb-top">
+            <span>PB do pobicia: 20 kg</span>
+            <span id="maciek-pb-text">0.0 kg</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="maciek-pb-bar"></div>
+          </div>
+        </div>
+      </article>
+    </section>
 
-<nav>
-    <a href="#" class="nav-btn active" onclick="nav('home')"><i class="fas fa-fish"></i>Duo</a>
-    <a href="#" class="nav-btn" onclick="nav('weather')"><i class="fas fa-cloud-bolt"></i>Pogoda</a>
-    <a href="#" class="nav-btn" onclick="nav('rigs')"><i class="fas fa-anchor"></i>Wiedza</a>
-    <a href="#" class="nav-btn" onclick="nav('check')"><i class="fas fa-clipboard-list"></i>Listy</a>
-</nav>
+    <section class="two-column">
+      <article class="panel-card">
+        <h3>Ostatni wpis</h3>
+        <div id="last-entry" class="empty-box">
+          Brak zapisanych połowów.
+        </div>
+      </article>
 
-<script>
-    // CONFIG
-    const TARGET_PB = 20.0;
-    const LAT = 47.65; // Coullons
-    const LON = 2.48;
-
-    // NAVIGATION
-    function nav(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + id).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    // COUNTDOWN
-    const tripDate = new Date("June 20, 2026 12:00:00").getTime();
-    setInterval(() => {
-        const diff = tripDate - new Date().getTime();
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff % 86400000) / 3600000);
-        document.getElementById("countdown").innerHTML = `DO STARTU: ${d} DNI ${h} GODZ.`;
-    }, 60000);
-
-    // WEATHER PRO (Open-Meteo)
-    async function getProWeather() {
-        try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,pressure_msl,wind_speed_10m&timezone=Europe%2FBerlin`;
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            const curr = data.current;
-            document.getElementById('weather-pro-box').innerHTML = `
-                <div class="weather-grid">
-                    <div class="w-item"><div class="w-label">Temp</div><div class="w-val">${curr.temperature_2m}°C</div></div>
-                    <div class="w-item"><div class="w-label">Ciśnienie</div><div class="w-val">${curr.pressure_msl} hPa</div></div>
-                    <div class="w-item"><div class="w-label">Wiatr</div><div class="w-val">${curr.wind_speed_10m} km/h</div></div>
-                    <div class="w-item"><div class="w-label">Porywy</div><div class="w-val">${curr.wind_gusts_10m} km/h</div></div>
-                </div>
-            `;
-
-            // Interpretacja
-            let intro = "WARUNKI: ";
-            if(curr.pressure_msl < 1010) intro += "Niskie ciśnienie - ryba może być bardzo aktywna! ";
-            if(curr.pressure_msl > 1020) intro += "Wysokie ciśnienie - szukaj ryb w toni (ZIG RIG). ";
-            if(curr.wind_speed_10m > 15) intro += "Silny wiatr - dotlenia wodę przy brzegu zawietrznym. ";
-            document.getElementById('weather-interpretation').innerHTML = intro;
-
-        } catch(e) { console.log("Błąd pogody"); }
-    }
-    getProWeather();
-
-    // RYBY & ANALITYKA
-    function addFish() {
-        const fish = {
-            id: Date.now(),
-            who: document.getElementById('fisher').value,
-            what: document.getElementById('spec').value || 'Karp',
-            kg: parseFloat(document.getElementById('wgt').value),
-            bait: document.getElementById('bait').value || '-',
-            spot: document.getElementById('spot').value || '?',
-            date: new Date().toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})
-        };
-        if(isNaN(fish.kg)) return;
-        let data = JSON.parse(localStorage.getItem('v10_catches') || "[]");
-        data.unshift(fish);
-        localStorage.setItem('v10_catches', JSON.stringify(data));
-        document.getElementById('wgt').value = '';
-        renderAll();
-    }
-
-    // CHECKLISTY
-    function addItem() {
-        const type = document.getElementById('check-selector').value;
-        const text = document.getElementById('new-item').value;
-        const unit = document.getElementById('new-unit').value;
-        if(!text) return;
-        let checks = JSON.parse(localStorage.getItem('v10_checks') || '{"pack":[],"shop":[],"food":[]}');
-        checks[type].push({id: Date.now(), text, unit, done: false});
-        localStorage.setItem('v10_checks', JSON.stringify(checks));
-        document.getElementById('new-item').value = '';
-        document.getElementById('new-unit').value = '';
-        renderChecklists();
-    }
-
-    function toggleCheck(type, id) {
-        let checks = JSON.parse(localStorage.getItem('v10_checks'));
-        let item = checks[type].find(i => i.id === id);
-        item.done = !item.done;
-        localStorage.setItem('v10_checks', JSON.stringify(checks));
-        renderChecklists();
-    }
-
-    function delCheck(type, id) {
-        let checks = JSON.parse(localStorage.getItem('v10_checks'));
-        checks[type] = checks[type].filter(i => i.id !== id);
-        localStorage.setItem('v10_checks', JSON.stringify(checks));
-        renderChecklists();
-    }
-
-    function renderAll() {
-        const catches = JSON.parse(localStorage.getItem('v10_catches') || "[]");
-        
-        // Historia
-        document.getElementById('catch-list').innerHTML = catches.map(f => `
-            <div class="rig-card" style="font-size:0.8rem;">
-                <div style="display:flex; justify-content:space-between;">
-                    <strong style="color:var(--accent);">${f.kg} KG</strong>
-                    <span>${f.who} | ${f.date}</span>
-                </div>
-                <div style="color:#888;">${f.what} | Przynęta: ${f.bait} | Spot: #${f.spot}</div>
-            </div>
-        `).join('');
-
-        // Analityka
-        const updatePBs = (name, sumId) => {
-            const userFish = catches.filter(f => f.who === name).map(f => f.kg);
-            const total = userFish.reduce((a, b) => a + b, 0);
-            document.getElementById(sumId).innerHTML = `${total.toFixed(1)} kg`;
-        };
-        updatePBs('Patryk', 'sum-patryk');
-        updatePBs('Maciek', 'sum-maciek');
-
-        // Top Stats
-        if(catches.length > 0) {
-            const topBait = [...new Set(catches.map(f => f.bait))].sort((a,b) => catches.filter(v => v===b).length - catches.filter(v => v===a).length)[0];
-            const topSpot = [...new Set(catches.map(f => f.spot))].sort((a,b) => catches.filter(v => v===b).length - catches.filter(v => v===a).length)[0];
-            document.getElementById('duo-stats').innerHTML = `
-                <div class="stat-row"><span>Najlepsza przynęta:</span><span class="stat-val">${topBait}</span></div>
-                <div class="stat-row"><span>Najlepszy Spot:</span><span class="stat-val">#${topSpot}</span></div>
-                <div class="stat-row"><span>Średnia waga:</span><span class="stat-val">${(catches.reduce((a,b)=>a+b.kg,0)/catches.length).toFixed(1)} kg</span></div>
-            `;
-        }
-    }
-
-    function renderChecklists() {
-        const type = document.getElementById('check-selector').value;
-        const checks = JSON.parse(localStorage.getItem('v10_checks') || '{"pack":[],"shop":[],"food":[]}');
-        document.getElementById('check-list-container').innerHTML = checks[type].map(i => `
-            <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:8px; margin-bottom:5px; border-radius:4px;">
-                <input type="checkbox" ${i.done ? 'checked' : ''} onclick="toggleCheck('${type}', ${i.id})" style="width:20px; margin:0;">
-                <span style="flex:1; ${i.done ? 'text-decoration:line-through; opacity:0.4' : ''}">${i.text} <small style="color:var(--neon-blue)">(${i.unit})</small></span>
-                <button class="btn-del" onclick="delCheck('${type}', ${i.id})">X</button>
-            </div>
-        `).join('');
-    }
-
-    // Inicjalizacja
-    renderAll();
-    renderChecklists();
-</script>
-
+      <article class="panel-card">
+        <h3>Szybki podgląd</h3>
+        <div class="quick-links">
+          <a href="pages/polowy.html">Przejdź do połowów</a>
+          <a href="pages/pogoda.html">Przejdź do pogody</a>
+          <a href="pages/checklisty.html">Przejdź do checklist</a>
+          <a href="pages/mapa.html">Przejdź do mapy spotów</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
 </body>
 </html>

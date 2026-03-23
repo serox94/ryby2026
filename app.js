@@ -7,7 +7,7 @@ const SUPABASE_URL = "https://baiepgxqnppwokcmmpqw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ziiHPrhOisVJXnUeOdI4ug_b4y4djws";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Łowisko: La Plaine des Bois 2, Coullons area
+// Łowisko
 const FISHING_SPOT = {
   name: "LodgingCarp – La Plaine des Bois 2",
   latitude: 47.621,
@@ -692,6 +692,7 @@ function getPressureTrend(hourlyPressure) {
 
 function getWeatherRating(current, hourly) {
   const wind = current.wind_speed_10m ?? 0;
+  const gusts = current.wind_gusts_10m ?? 0;
   const pressure = current.pressure_msl ?? 0;
   const precipitation = current.precipitation ?? 0;
   const trend = getPressureTrend(hourly.pressure_msl);
@@ -700,6 +701,9 @@ function getWeatherRating(current, hourly) {
 
   if (wind >= 8 && wind <= 22) score += 2;
   else if (wind > 22) score += 1;
+
+  if (gusts <= 35) score += 1;
+  else if (gusts > 55) score -= 1;
 
   if (pressure >= 1005 && pressure <= 1020) score += 2;
   else if (pressure >= 995 && pressure <= 1025) score += 1;
@@ -710,47 +714,163 @@ function getWeatherRating(current, hourly) {
   if (precipitation > 0 && precipitation <= 2) score += 1;
   if (precipitation > 5) score -= 1;
 
-  if (score >= 5) return "Dobre";
+  if (score >= 6) return "Dobre";
   if (score >= 3) return "Średnie";
   return "Słabe";
+}
+
+function getNightCampRating(night) {
+  let score = 0;
+
+  if (night.temp >= 10 && night.temp <= 18) score += 2;
+  else if (night.temp >= 6 && night.temp < 10) score += 1;
+
+  if (night.wind <= 18) score += 2;
+  else if (night.wind <= 28) score += 1;
+
+  if (night.gusts <= 30) score += 1;
+  else if (night.gusts > 45) score -= 1;
+
+  if (night.humidity <= 88) score += 1;
+  else score -= 1;
+
+  if (night.visibility >= 3000) score += 1;
+  else score -= 1;
+
+  if (score >= 5) return "Komfortowa";
+  if (score >= 2) return "Średnia";
+  return "Ciężka";
+}
+
+// Proste przybliżenie fazy księżyca
+function getMoonPhaseInfo(dateInput) {
+  const date = new Date(dateInput);
+  const knownNewMoon = new Date("2000-01-06T18:14:00Z");
+  const synodicMonth = 29.53058867;
+  const daysSince = (date - knownNewMoon) / 86400000;
+  const phase = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
+  const illumination = (1 - Math.cos((2 * Math.PI * phase) / synodicMonth)) / 2;
+
+  let name = "Nów";
+  if (phase < 1.84566) name = "Nów";
+  else if (phase < 5.53699) name = "Przybywający sierp";
+  else if (phase < 9.22831) name = "Pierwsza kwadra";
+  else if (phase < 12.91963) name = "Przybywający garb";
+  else if (phase < 16.61096) name = "Pełnia";
+  else if (phase < 20.30228) name = "Ubywający garb";
+  else if (phase < 23.99361) name = "Ostatnia kwadra";
+  else if (phase < 27.68493) name = "Ubywający sierp";
+  else name = "Nów";
+
+  return {
+    name,
+    illumination: `${Math.round(illumination * 100)}%`
+  };
+}
+
+function pickNightWindow(hourly) {
+  const hours = hourly.time.map((time, index) => ({
+    time,
+    temp: hourly.temperature_2m[index],
+    wind: hourly.wind_speed_10m[index],
+    gusts: hourly.wind_gusts_10m[index],
+    humidity: hourly.relative_humidity_2m[index],
+    visibility: hourly.visibility[index]
+  }));
+
+  const nightHours = hours.filter(h => {
+    const hour = new Date(h.time).getHours();
+    return hour >= 22 || hour <= 5;
+  });
+
+  if (!nightHours.length) {
+    return { temp: 0, wind: 0, gusts: 0, humidity: 0, visibility: 0 };
+  }
+
+  const avg = (arr, key) => arr.reduce((sum, item) => sum + Number(item[key] || 0), 0) / arr.length;
+
+  return {
+    temp: avg(nightHours, "temp"),
+    wind: avg(nightHours, "wind"),
+    gusts: avg(nightHours, "gusts"),
+    humidity: avg(nightHours, "humidity"),
+    visibility: avg(nightHours, "visibility")
+  };
 }
 
 function buildWeatherInterpretation(current, hourly) {
   const notes = [];
   const wind = current.wind_speed_10m ?? 0;
+  const gusts = current.wind_gusts_10m ?? 0;
   const pressure = current.pressure_msl ?? 0;
   const direction = windDirectionToText(current.wind_direction_10m);
   const trend = getPressureTrend(hourly.pressure_msl);
+  const dewPoint = current.dew_point_2m ?? 0;
+  const humidity = current.relative_humidity_2m ?? 0;
+  const cloud = current.cloud_cover ?? 0;
 
   if (trend === "Spada") {
-    notes.push("Ciśnienie spada — często przed zmianą pogody aktywność ryb potrafi wzrosnąć.");
+    notes.push("Ciśnienie spada — to często daje okno aktywności przed zmianą pogody i warto pilnować zestawów.");
   } else if (trend === "Rośnie") {
-    notes.push("Ciśnienie rośnie — ryby mogą żerować ostrożniej, warto łowić precyzyjniej.");
+    notes.push("Ciśnienie rośnie — ryby mogą żerować ostrożniej, więc lepiej łowić precyzyjnie i nie przesadzać z kombinowaniem.");
   } else {
-    notes.push("Ciśnienie jest dość stabilne — warunki są przewidywalne, bez gwałtownych zmian.");
+    notes.push("Ciśnienie jest stabilne — warunki są spokojniejsze i bardziej przewidywalne.");
   }
 
   if (wind >= 8 && wind <= 22) {
-    notes.push(`Wiatr jest sensowny (${wind.toFixed(1)} km/h), co często pomaga. Kierunek: ${direction}.`);
+    notes.push(`Wiatr jest sensowny (${wind.toFixed(1)} km/h). Często to pomaga, zwłaszcza gdy dmucha w Wasz brzeg. Kierunek: ${direction}.`);
   } else if (wind > 22) {
-    notes.push(`Wiatr jest mocny (${wind.toFixed(1)} km/h). Może pomagać, ale prezentacja zestawu musi być pewna.`);
+    notes.push(`Wiatr jest mocny (${wind.toFixed(1)} km/h, porywy ${gusts.toFixed(1)} km/h). Może pomagać w aktywności ryb, ale zestaw i obozowisko muszą być dobrze ustawione.`);
   } else {
-    notes.push(`Wiatr jest słaby (${wind.toFixed(1)} km/h). Ryby mogą być bardziej rozproszone.`);
+    notes.push(`Wiatr jest słaby (${wind.toFixed(1)} km/h). Ryby mogą być bardziej rozproszone i trudniejsze do znalezienia.`);
   }
 
   if (pressure >= 1022) {
-    notes.push(`Ciśnienie jest dość wysokie (${pressure.toFixed(0)} hPa). To nie przekreśla łowienia, ale czasem trzeba łowić delikatniej i dokładniej.`);
+    notes.push(`Ciśnienie jest dość wysokie (${pressure.toFixed(0)} hPa). To nie przekreśla brań, ale często trzeba łowić dokładniej.`);
   } else if (pressure <= 1000) {
-    notes.push(`Ciśnienie jest niskie (${pressure.toFixed(0)} hPa). Często to dobry moment na aktywność ryb, zwłaszcza przed frontem.`);
+    notes.push(`Ciśnienie jest niskie (${pressure.toFixed(0)} hPa). To bywa dobry moment na żerowanie, szczególnie przed frontem.`);
   } else {
     notes.push(`Ciśnienie jest w rozsądnym zakresie (${pressure.toFixed(0)} hPa).`);
+  }
+
+  if (humidity >= 85 && dewPoint >= 10) {
+    notes.push("Wilgotność i punkt rosy są wysokie — nocą może być ciężej na obozie, bardziej mokro i duszno.");
+  }
+
+  if (cloud >= 70) {
+    notes.push("Duże zachmurzenie może pomóc utrzymać stabilniejsze warunki termiczne i ograniczyć ostre słońce w dzień.");
   }
 
   return notes;
 }
 
+function buildCampInterpretation(night, moonInfo) {
+  const notes = [];
+  const campRating = getNightCampRating(night);
+
+  notes.push(`Ocena nocy na obozowanie: ${campRating}.`);
+
+  if (night.wind > 25) {
+    notes.push("Noc zapowiada się wietrznie — dobrze dociążyć rzeczy, sprawdzić namiot i nie zostawiać luzem sprzętu.");
+  } else {
+    notes.push("Wiatr nocą nie wygląda groźnie — obozowisko powinno być do opanowania.");
+  }
+
+  if (night.humidity > 88) {
+    notes.push("Wilgotność nocą będzie wysoka — spodziewaj się większej ilości rosy i bardziej mokrego obozowiska rano.");
+  }
+
+  if (night.visibility < 2000) {
+    notes.push("Widzialność nocą może być słaba — możliwa mgła lub wilgotne powietrze, warto mieć wszystko dobrze przygotowane.");
+  }
+
+  notes.push(`Faza księżyca: ${moonInfo.name} (${moonInfo.illumination} oświetlenia). Traktuj to jako dodatek, a nie główny wskaźnik brań.`);
+
+  return notes;
+}
+
 async function fetchWeatherData() {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${FISHING_SPOT.latitude}&longitude=${FISHING_SPOT.longitude}&current=temperature_2m,apparent_temperature,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m,relative_humidity_2m,cloud_cover&hourly=temperature_2m,pressure_msl,wind_speed_10m,wind_direction_10m,precipitation,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&timezone=auto&forecast_days=7`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${FISHING_SPOT.latitude}&longitude=${FISHING_SPOT.longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover,visibility,uv_index&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover,visibility,uv_index,soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant,wind_gusts_10m_max,sunshine_duration,uv_index_max&timezone=auto&forecast_days=7`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -763,11 +883,14 @@ async function fetchWeatherData() {
 function renderWeatherCurrent(data) {
   const current = data.current;
   const hourly = data.hourly;
+  const daily = data.daily;
+  const trend = getPressureTrend(hourly.pressure_msl);
+  const rating = getWeatherRating(current, hourly);
 
   document.getElementById("weather-current-temp").textContent = `${current.temperature_2m.toFixed(1)}°C`;
-  document.getElementById("weather-current-wind").textContent = `${current.wind_speed_10m.toFixed(1)} km/h`;
-  document.getElementById("weather-current-pressure").textContent = `${current.pressure_msl.toFixed(0)} hPa`;
-  document.getElementById("weather-rating").textContent = getWeatherRating(current, hourly);
+  document.getElementById("weather-current-wind").textContent = `${current.wind_speed_10m.toFixed(1)} / ${current.wind_gusts_10m.toFixed(1)} km/h`;
+  document.getElementById("weather-current-pressure").textContent = `${current.pressure_msl.toFixed(0)} hPa / ${trend}`;
+  document.getElementById("weather-rating").textContent = rating;
 
   document.getElementById("weather-description").textContent = weatherCodeToText(current.weather_code);
   document.getElementById("weather-apparent-temp").textContent = `${current.apparent_temperature.toFixed(1)}°C`;
@@ -775,11 +898,36 @@ function renderWeatherCurrent(data) {
   document.getElementById("weather-cloud-cover").textContent = `${current.cloud_cover}%`;
   document.getElementById("weather-precipitation").textContent = `${current.precipitation.toFixed(1)} mm`;
   document.getElementById("weather-humidity").textContent = `${current.relative_humidity_2m}%`;
+  document.getElementById("weather-dew-point").textContent = `${current.dew_point_2m.toFixed(1)}°C`;
+  document.getElementById("weather-visibility").textContent = `${Math.round(current.visibility / 1000)} km`;
+  document.getElementById("weather-uv").textContent = `${current.uv_index?.toFixed(1) ?? "--"}`;
+  document.getElementById("weather-sunshine").textContent = `${Math.round((daily.sunshine_duration?.[0] || 0) / 3600)} h`;
 
   const notes = buildWeatherInterpretation(current, hourly);
   document.getElementById("weather-interpretation").innerHTML = notes
     .map(note => `<div class="weather-note">${note}</div>`)
     .join("");
+
+  const night = pickNightWindow(hourly);
+  const campRating = getNightCampRating(night);
+  const moonInfo = getMoonPhaseInfo(new Date());
+
+  document.getElementById("camp-night-temp").textContent = `${night.temp.toFixed(1)}°C`;
+  document.getElementById("camp-night-wind").textContent = `${night.wind.toFixed(1)} km/h`;
+  document.getElementById("camp-night-gusts").textContent = `${night.gusts.toFixed(1)} km/h`;
+  document.getElementById("camp-night-humidity").textContent = `${Math.round(night.humidity)}%`;
+  document.getElementById("camp-night-visibility").textContent = `${Math.round(night.visibility / 1000)} km`;
+  document.getElementById("camp-night-rating").textContent = campRating;
+  document.getElementById("moon-phase").textContent = moonInfo.name;
+  document.getElementById("moon-illumination").textContent = moonInfo.illumination;
+
+  const campNotes = buildCampInterpretation(night, moonInfo);
+  document.getElementById("camp-interpretation").innerHTML = campNotes
+    .map(note => `<div class="weather-note">${note}</div>`)
+    .join("");
+
+  document.getElementById("soil-temp").textContent = `${hourly.soil_temperature_0cm?.[0]?.toFixed(1) ?? "--"}°C`;
+  document.getElementById("soil-moisture").textContent = `${Math.round((hourly.soil_moisture_0_to_1cm?.[0] || 0) * 100)}%`;
 }
 
 function renderWeatherHourly(data) {
@@ -787,20 +935,15 @@ function renderWeatherHourly(data) {
   if (!container) return;
 
   const times = data.hourly.time.slice(0, 24);
-  const temps = data.hourly.temperature_2m.slice(0, 24);
-  const winds = data.hourly.wind_speed_10m.slice(0, 24);
-  const windDirs = data.hourly.wind_direction_10m.slice(0, 24);
-  const pressure = data.hourly.pressure_msl.slice(0, 24);
-  const precipitation = data.hourly.precipitation.slice(0, 24);
-
   container.innerHTML = times.map((time, index) => `
     <div class="weather-row">
       <strong>${formatHour(time)}</strong>
-      <div class="weather-chip">${temps[index].toFixed(1)}°C</div>
-      <div class="weather-chip">${winds[index].toFixed(1)} km/h</div>
-      <div class="weather-chip">${windDirectionToText(windDirs[index])}</div>
-      <div class="weather-chip">${pressure[index].toFixed(0)} hPa</div>
-      <div class="weather-chip">${precipitation[index].toFixed(1)} mm</div>
+      <div class="weather-chip">${data.hourly.temperature_2m[index].toFixed(1)}°C</div>
+      <div class="weather-chip">${data.hourly.wind_speed_10m[index].toFixed(1)} / ${data.hourly.wind_gusts_10m[index].toFixed(1)} km/h</div>
+      <div class="weather-chip">${windDirectionToText(data.hourly.wind_direction_10m[index])}</div>
+      <div class="weather-chip">${data.hourly.pressure_msl[index].toFixed(0)} hPa</div>
+      <div class="weather-chip">${data.hourly.precipitation[index].toFixed(1)} mm</div>
+      <div class="weather-chip">${weatherCodeToText(data.hourly.weather_code[index])}</div>
     </div>
   `).join("");
 }
@@ -810,21 +953,15 @@ function renderWeatherDaily(data) {
   if (!container) return;
 
   const times = data.daily.time;
-  const weatherCodes = data.daily.weather_code;
-  const tempMax = data.daily.temperature_2m_max;
-  const tempMin = data.daily.temperature_2m_min;
-  const precip = data.daily.precipitation_sum;
-  const windMax = data.daily.wind_speed_10m_max;
-  const windDir = data.daily.wind_direction_10m_dominant;
-
   container.innerHTML = times.map((time, index) => `
     <div class="weather-row">
       <strong>${formatDay(time)}</strong>
-      <div class="weather-chip">${weatherCodeToText(weatherCodes[index])}</div>
-      <div class="weather-chip">Min ${tempMin[index].toFixed(1)}°C / Max ${tempMax[index].toFixed(1)}°C</div>
-      <div class="weather-chip">Opad ${precip[index].toFixed(1)} mm</div>
-      <div class="weather-chip">Wiatr ${windMax[index].toFixed(1)} km/h</div>
-      <div class="weather-chip">${windDirectionToText(windDir[index])}</div>
+      <div class="weather-chip">${weatherCodeToText(data.daily.weather_code[index])}</div>
+      <div class="weather-chip">Min ${data.daily.temperature_2m_min[index].toFixed(1)}°C / Max ${data.daily.temperature_2m_max[index].toFixed(1)}°C</div>
+      <div class="weather-chip">Opad ${data.daily.precipitation_sum[index].toFixed(1)} mm</div>
+      <div class="weather-chip">Wiatr ${data.daily.wind_speed_10m_max[index].toFixed(1)} km/h</div>
+      <div class="weather-chip">Porywy ${data.daily.wind_gusts_10m_max[index].toFixed(1)} km/h</div>
+      <div class="weather-chip">Słońce ${Math.round((data.daily.sunshine_duration[index] || 0) / 3600)} h</div>
     </div>
   `).join("");
 }
@@ -847,6 +984,7 @@ async function renderWeatherPage() {
     document.getElementById("weather-rating").textContent = "Błąd";
     document.getElementById("weather-description").textContent = "Nie udało się pobrać pogody";
     document.getElementById("weather-interpretation").innerHTML = `<div class="weather-note">Nie udało się pobrać danych pogodowych. Spróbuj odświeżyć.</div>`;
+    document.getElementById("camp-interpretation").innerHTML = `<div class="weather-note">Brak danych do oceny obozowania.</div>`;
   }
 }
 

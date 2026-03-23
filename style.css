@@ -77,9 +77,22 @@ a {
 
 .main-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
   padding: 0 0 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.main-nav::-webkit-scrollbar {
+  height: 6px;
+}
+
+.main-nav::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
 }
 
 .main-nav a {
@@ -89,6 +102,8 @@ a {
   background: var(--bg-soft);
   color: var(--muted);
   transition: 0.2s ease;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .main-nav a:hover,
@@ -263,20 +278,79 @@ a {
     width: min(100% - 20px, var(--max-width));
   }
 
+  .site-header {
+    position: static;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .header-top {
+    gap: 16px;
+    padding: 18px 0 14px;
   }
 
   .header-top h1 {
     font-size: 1.6rem;
   }
 
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .trip-box {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
   .main-nav {
     gap: 8px;
+    padding: 0 0 14px;
   }
 
   .main-nav a {
-    width: 100%;
+    width: auto;
     text-align: center;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+  }
+
+  .page-content {
+    padding: 20px 0 30px;
+  }
+
+  .hero-card,
+  .panel-card,
+  .stat-card {
+    border-radius: 14px;
+  }
+
+  .hero-card,
+  .panel-card {
+    padding: 18px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card strong {
+    font-size: 1.4rem;
+  }
+
+  .panel-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+  }
+
+  .mini-stats div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pb-top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

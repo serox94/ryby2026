@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ryby 2026 | Mapa spotów / dna</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="header-top">
+        <div>
+          <h1>Ryby 2026</h1>
+          <p class="subtitle">LodgingCarp – La Plaine des Bois 2</p>
+        </div>
 
+        <div class="trip-box">
+          <div><strong>Wyjazd:</strong> 20.06.2026, 14:00</div>
+          <div><strong>Powrót:</strong> 27.06.2026, 10:00</div>
+          <div id="countdown"><strong>Status:</strong> ładowanie...</div>
+        </div>
+      </div>
+
+      <div class="mobile-nav-wrap">
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+          ☰ Menu
+        </button>
+
+        <nav class="main-nav" id="main-nav">
+          <a href="../index.html">Dashboard</a>
+          <a href="polowy.html">Połowy</a>
+          <a href="pogoda.html">Pogoda PRO</a>
+          <a href="wezly.html">Węzły</a>
+          <a href="rigi.html">Rigi</a>
+          <a href="checklisty.html">Checklisty</a>
+          <a href="mapa.html" class="active">Mapa spotów / dna</a>
+          <a href="porady.html">Porady</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page-content">
+    <section class="hero-card">
+      <div>
+        <h2>Mapa spotów / dna</h2>
+        <p>
+          Wspólna baza spotów, odległości, głębokości, typu dna i notatek.
+        </p>
+      </div>
+    </section>
+
+    <section class="two-column">
+      <article class="panel-card">
+        <h3>Dodaj spot</h3>
+
+        <form id="spot-form" class="form-grid">
+          <div class="form-row">
+            <div>
+              <label for="spot-name">Nazwa spotu</label>
+              <input type="text" id="spot-name" maxlength="60" placeholder="np. Spot 1 / lewa trzcina" required />
+            </div>
+
+            <div>
+              <label for="spot-distance">Odległość (m)</label>
+              <input type="number" id="spot-distance" min="0" step="0.1" placeholder="np. 85" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label for="spot-depth">Głębokość (m)</label>
+              <input type="number" id="spot-depth" min="0" step="0.1" placeholder="np. 2.4" />
+            </div>
+
+            <div>
+              <label for="spot-bottom">Typ dna</label>
+              <input type="text" id="spot-bottom" maxlength="60" placeholder="np. twarde / muł / żwir" />
+            </div>
+          </div>
+
+          <div>
+            <label for="spot-note">Notatka</label>
+            <textarea id="spot-note" rows="4" placeholder="Opis, marker, zaczepy, obserwacje..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit">Dodaj spot</button>
+          </div>
+
+          <div id="spot-message" class="form-message" aria-live="polite"></div>
+        </form>
+      </article>
+
+      <article class="panel-card">
+        <h3>Podsumowanie spotów</h3>
+
+        <div class="mini-stats">
+          <div><span>Liczba spotów</span><strong id="spots-count">0</strong></div>
+          <div><span>Śr. odległość</span><strong id="spots-avg-distance">--</strong></div>
+          <div><span>Śr. głębokość</span><strong id="spots-avg-depth">--</strong></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel-card">
+      <div class="section-head">
+        <h3>Lista spotów</h3>
+        <button id="refresh-spots-btn" type="button" class="secondary-btn">Odśwież</button>
+      </div>
+
+      <div id="spots-list" class="list-grid">
+        <div class="empty-box">Ładowanie spotów...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../app.js"></script>
+</body>
+</html>

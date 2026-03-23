@@ -799,3 +799,22 @@ button:hover {
     align-items: stretch;
   }
 }
+.hidden {
+  display: none !important;
+}
+
+.edit-btn {
+  background: #325b9b;
+  border-color: #4978c1;
+}
+
+.inline-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muted-small {
+  color: var(--muted);
+  font-size: 0.88rem;
+}

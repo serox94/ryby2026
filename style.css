@@ -663,3 +663,70 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+.weather-top-grid {
+  margin-bottom: 24px;
+}
+
+.weather-interpretation {
+  display: grid;
+  gap: 12px;
+  color: var(--muted);
+}
+
+.weather-note {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+.weather-hourly-list,
+.weather-daily-list {
+  display: grid;
+  gap: 12px;
+}
+
+.weather-row {
+  display: grid;
+  grid-template-columns: 150px repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+
+.weather-row strong {
+  font-size: 0.98rem;
+}
+
+.weather-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #121722;
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .weather-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .weather-row strong {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .weather-row {
+    grid-template-columns: 1fr;
+  }
+}

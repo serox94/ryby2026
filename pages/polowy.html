@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ryby 2026 | Połowy</title>
   <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../weather-plus.css" />
 </head>
 <body>
   <header class="site-header">
@@ -44,6 +45,7 @@
   <main class="container page-content">
     <section class="hero-card">
       <div>
+        <div class="eyebrow">🐟 Rejestr połowów</div>
         <h2>Połowy</h2>
         <p>
           Dodawanie, edycja i usuwanie połowów. Dane są wspólne i aktualizują się na żywo.
@@ -88,7 +90,7 @@
           <div class="form-row">
             <div>
               <label for="spot">Spot (tekst)</label>
-              <input type="text" id="spot" placeholder="np. Spot 3" maxlength="50" required />
+              <input type="text" id="spot" placeholder="np. Spot 3" maxlength="50" />
             </div>
 
             <div>
@@ -121,10 +123,10 @@
       </article>
 
       <article class="panel-card">
-        <h3>Szybkie podsumowanie</h3>
+        <h3>🐟 Szybkie podsumowanie</h3>
 
         <div class="mini-stats">
-          <div><span>Łącznie połowów</span><strong id="catch-count">0</strong></div>
+          <div><span>Liczba połowów</span><strong id="catch-count">0</strong></div>
           <div><span>Łączna waga</span><strong id="catch-total-weight">0.0 kg</strong></div>
           <div><span>Największa ryba</span><strong id="catch-biggest">Brak</strong></div>
           <div><span>Najczęstszy spot</span><strong id="catch-best-spot">Brak</strong></div>
@@ -136,7 +138,7 @@
 
     <section class="panel-card">
       <div class="section-head">
-        <h3>Lista połowów</h3>
+        <h3>📋 Lista połowów</h3>
         <button id="refresh-catches-btn" type="button" class="secondary-btn">Odśwież</button>
       </div>
 
@@ -148,5 +150,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../app.js"></script>
+  <script src="../fixes.js"></script>
 </body>
 </html>

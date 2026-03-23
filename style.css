@@ -354,3 +354,166 @@ a {
     align-items: flex-start;
   }
 }
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  opacity: 0.92;
+}
+
+.secondary-btn {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+.danger-btn {
+  background: #7c1f28;
+  border-color: #9a2a36;
+}
+
+.form-message {
+  min-height: 24px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.form-message.success {
+  color: #7ee2b8;
+}
+
+.form-message.error {
+  color: #ff8a8a;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.list-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.catch-item {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-soft);
+  padding: 16px;
+}
+
+.catch-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.catch-item h4 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.catch-meta {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.catch-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #121722;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.catch-note {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .section-head,
+  .catch-item-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

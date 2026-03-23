@@ -1053,3 +1053,198 @@ if (isWeatherPage) {
 window.deleteCatch = deleteCatch;
 window.toggleChecklistItem = toggleChecklistItem;
 window.deleteChecklistItem = deleteChecklistItem;
+
+// SPOTY
+
+function setSpotMessage(message, type = "") {
+  const box = document.getElementById("spot-message");
+  if (!box) return;
+
+  box.textContent = message;
+  box.className = "form-message";
+  if (type) box.classList.add(type);
+}
+
+function validateSpotForm(values) {
+  if (!values.name.trim()) return "Podaj nazwę spotu.";
+  return null;
+}
+
+async function handleSpotSubmit(event) {
+  event.preventDefault();
+
+  const values = {
+    name: document.getElementById("spot-name")?.value || "",
+    distance_m: document.getElementById("spot-distance")?.value || "",
+    depth_m: document.getElementById("spot-depth")?.value || "",
+    bottom_type: document.getElementById("spot-bottom")?.value || "",
+    note: document.getElementById("spot-note")?.value || ""
+  };
+
+  const validationError = validateSpotForm(values);
+  if (validationError) {
+    setSpotMessage(validationError, "error");
+    return;
+  }
+
+  setSpotMessage("Zapisywanie spotu...");
+
+  const payload = {
+    name: values.name.trim(),
+    distance_m: values.distance_m ? Number(values.distance_m) : null,
+    depth_m: values.depth_m ? Number(values.depth_m) : null,
+    bottom_type: values.bottom_type.trim() || null,
+    note: values.note.trim() || null
+  };
+
+  const { error } = await supabaseClient
+    .from("spots")
+    .insert([payload]);
+
+  if (error) {
+    console.error("Błąd dodawania spotu:", error);
+    setSpotMessage("Nie udało się dodać spotu.", "error");
+    return;
+  }
+
+  setSpotMessage("Spot został dodany.", "success");
+  document.getElementById("spot-form")?.reset();
+  await renderSpotsPage();
+}
+
+async function deleteSpot(id) {
+  const confirmed = window.confirm("Usunąć ten spot?");
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from("spots")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Błąd usuwania spotu:", error);
+    alert("Nie udało się usunąć spotu.");
+    return;
+  }
+
+  await renderSpotsPage();
+}
+
+async function loadSpotsFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("spots")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Błąd pobierania spotów:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+function renderSpotsSummary(spots) {
+  const countEl = document.getElementById("spots-count");
+  if (!countEl) return;
+
+  const distanceValues = spots.filter(s => s.distance_m !== null).map(s => Number(s.distance_m));
+  const depthValues = spots.filter(s => s.depth_m !== null).map(s => Number(s.depth_m));
+
+  const avgDistance = distanceValues.length
+    ? (distanceValues.reduce((a, b) => a + b, 0) / distanceValues.length).toFixed(1)
+    : "--";
+
+  const avgDepth = depthValues.length
+    ? (depthValues.reduce((a, b) => a + b, 0) / depthValues.length).toFixed(1)
+    : "--";
+
+  document.getElementById("spots-count").textContent = spots.length;
+  document.getElementById("spots-avg-distance").textContent = avgDistance === "--" ? "--" : `${avgDistance} m`;
+  document.getElementById("spots-avg-depth").textContent = avgDepth === "--" ? "--" : `${avgDepth} m`;
+}
+
+function renderSpotsList(spots) {
+  const list = document.getElementById("spots-list");
+  if (!list) return;
+
+  if (!spots.length) {
+    list.innerHTML = `<div class="empty-box">Brak zapisanych spotów.</div>`;
+    return;
+  }
+
+  list.innerHTML = spots.map(item => `
+    <article class="spot-card">
+      <div class="spot-card-top">
+        <div>
+          <h4>${item.name}</h4>
+          <div class="catch-meta">Dodano: ${formatCaughtAt(item.created_at)}</div>
+        </div>
+        <div>
+          <button class="danger-btn" onclick="deleteSpot(${item.id})">Usuń</button>
+        </div>
+      </div>
+
+      <div class="catch-badges">
+        <span class="badge">Odległość: ${item.distance_m !== null ? `${Number(item.distance_m).toFixed(1)} m` : "brak"}</span>
+        <span class="badge">Głębokość: ${item.depth_m !== null ? `${Number(item.depth_m).toFixed(1)} m` : "brak"}</span>
+        <span class="badge">Dno: ${item.bottom_type || "brak"}</span>
+      </div>
+
+      ${item.note ? `<div class="catch-note">${item.note}</div>` : ""}
+    </article>
+  `).join("");
+}
+
+async function renderSpotsPage() {
+  const list = document.getElementById("spots-list");
+  if (!list) return;
+
+  list.innerHTML = `<div class="empty-box">Ładowanie spotów...</div>`;
+  const spots = await loadSpotsFromSupabase();
+  renderSpotsSummary(spots);
+  renderSpotsList(spots);
+}
+
+function bindSpotsPageEvents() {
+  const form = document.getElementById("spot-form");
+  if (form) {
+    form.addEventListener("submit", handleSpotSubmit);
+  }
+
+  const refreshBtn = document.getElementById("refresh-spots-btn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", renderSpotsPage);
+  }
+}
+
+async function initSpotsPage() {
+  updateCountdown();
+  setupMobileMenu();
+  bindSpotsPageEvents();
+  await renderSpotsPage();
+  setInterval(updateCountdown, 30000);
+}
+
+// PROSTE STRONY WIEDZY
+
+function initKnowledgePage() {
+  updateCountdown();
+  setupMobileMenu();
+  setInterval(updateCountdown, 30000);
+}
+
+const isSpotsPage = document.getElementById("spot-form");
+const isKnotsPage = document.querySelector(".knowledge-grid") && window.location.pathname.includes("wezly");
+const isRigsPage = document.querySelector(".knowledge-grid") && window.location.pathname.includes("rigi");
+const isTipsPage = document.querySelector(".knowledge-grid") && window.location.pathname.includes("porady");
+
+if (isSpotsPage) {
+  initSpotsPage();
+}
+
+if (isKnotsPage || isRigsPage || isTipsPage) {
+  initKnowledgePage();
+}
+
+window.deleteSpot = deleteSpot;

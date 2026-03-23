@@ -12,7 +12,7 @@
       <div class="header-top">
         <div>
           <h1>Ryby 2026</h1>
-          <p class="subtitle">LodgingCarp – La Plaine des Bois 2</p>
+          <p class="subtitle">LodgingCarp - La Plaine des Bois 2</p>
         </div>
 
         <div class="trip-box">
@@ -53,9 +53,11 @@
 
     <section class="two-column">
       <article class="panel-card">
-        <h3>Dodaj spot</h3>
+        <h3 id="spot-form-title">Dodaj spot</h3>
 
         <form id="spot-form" class="form-grid">
+          <input type="hidden" id="edit-spot-id" />
+
           <div class="form-row">
             <div>
               <label for="spot-name">Nazwa spotu</label>
@@ -82,11 +84,12 @@
 
           <div>
             <label for="spot-note">Notatka</label>
-            <textarea id="spot-note" rows="4" placeholder="Opis, marker, zaczepy, obserwacje..."></textarea>
+            <textarea id="spot-note" rows="4" maxlength="500" placeholder="Opis, marker, zaczepy, obserwacje..."></textarea>
           </div>
 
           <div class="form-actions">
-            <button type="submit">Dodaj spot</button>
+            <button type="submit" id="save-spot-btn">Dodaj spot</button>
+            <button type="button" id="cancel-edit-spot-btn" class="secondary-btn hidden">Anuluj edycję</button>
           </div>
 
           <div id="spot-message" class="form-message" aria-live="polite"></div>

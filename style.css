@@ -164,6 +164,9 @@ img {
 .main-nav a[href*="checklisty"]::before { content: "✅"; }
 .main-nav a[href*="mapa"]::before { content: "🗺️"; }
 .main-nav a[href*="porady"]::before { content: "💡"; }
+.main-nav a[href*="dojazd"]::before { content: "🧭"; }
+.main-nav a[href*="regulamin"]::before { content: "📜"; }
+
 
 .page-content {
   padding: 30px 0 42px;

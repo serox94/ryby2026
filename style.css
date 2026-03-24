@@ -875,3 +875,38 @@ canvas {
     flex-direction: column;
   }
 }
+@media (max-width: 900px) {
+  .mobile-nav-wrap {
+    position: relative;
+    z-index: 2000;
+  }
+
+  .menu-toggle {
+    position: relative;
+    z-index: 2002;
+  }
+
+  .main-nav {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    z-index: 2001;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(10, 15, 24, 0.98);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+  }
+
+  .main-nav.open {
+    display: flex !important;
+  }
+
+  .main-nav a {
+    width: 100%;
+  }
+}

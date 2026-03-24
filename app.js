@@ -152,29 +152,45 @@ function setupMobileMenu() {
 
   toggleBtn.dataset.bound = "1";
 
-  const closeMenu = () => {
+  function closeMenu() {
     nav.classList.remove("open");
     toggleBtn.setAttribute("aria-expanded", "false");
-  };
+  }
 
-  toggleBtn.addEventListener("click", (event) => {
+  function openMenu() {
+    nav.classList.add("open");
+    toggleBtn.setAttribute("aria-expanded", "true");
+  }
+
+  toggleBtn.addEventListener("click", function (event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const willOpen = !nav.classList.contains("open");
-    nav.classList.toggle("open", willOpen);
-    toggleBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    if (nav.classList.contains("open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   });
 
-  nav.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", closeMenu);
+  nav.querySelectorAll("a").forEach(function (link) {
+    link.addEventListener("click", function () {
+      closeMenu();
+    });
   });
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener("click", function (event) {
     if (!nav.contains(event.target) && !toggleBtn.contains(event.target)) {
       closeMenu();
     }
   });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 900) {
+      closeMenu();
+    }
+  });
+}
 
   window.addEventListener("resize", () => {
     if (window.innerWidth > 900) {
@@ -1329,7 +1345,7 @@ function updateDashboard(catches, spots = [], checklist = []) {
     }
   }
 
-  const chartCanvas = document.getElementById("fishChart");
+const chartCanvas = document.getElementById("fishChart");
 if (chartCanvas && window.Chart) {
   const chartCtx = chartCanvas.getContext("2d");
   if (chartCtx) {
@@ -1350,11 +1366,11 @@ if (chartCanvas && window.Chart) {
     }
 
     chartInstance = new window.Chart(chartCtx, {
+      type: "bar",
       data: {
         labels,
         datasets: [
           {
-            type: "bar",
             label: "Łączna waga ryb (kg)",
             data: weightValues,
             backgroundColor: ["rgba(73,166,255,0.72)", "rgba(61,220,151,0.72)"],
@@ -1368,7 +1384,7 @@ if (chartCanvas && window.Chart) {
             label: "Liczba ryb",
             data: countValues,
             borderColor: "rgba(255,215,120,1)",
-            backgroundColor: "rgba(255,215,120,0.2)",
+            backgroundColor: "rgba(255,215,120,0.18)",
             tension: 0.25,
             fill: false,
             pointRadius: 5,
@@ -1380,6 +1396,7 @@ if (chartCanvas && window.Chart) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        resizeDelay: 150,
         plugins: {
           legend: {
             labels: {

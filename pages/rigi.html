@@ -6,6 +6,67 @@
   <title>Ryby 2026 | Rigi</title>
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../ui-plus.css" />
+  <style>
+    .guide-media {
+      margin: 14px 0 16px;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(12, 17, 25, 0.9);
+    }
+
+    .guide-media img {
+      display: block;
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: #0f141c;
+    }
+
+    .guide-caption {
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .guide-kicker {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .guide-note-box {
+      display: grid;
+      gap: 10px;
+    }
+
+    .guide-mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(17, 24, 35, 0.92);
+      font-size: 0.84rem;
+      color: var(--text);
+    }
+
+    .guide-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .guide-media img {
+        height: 180px;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -50,7 +111,7 @@
         <h2>Rigi karpiowe</h2>
         <p>
           Najważniejsze przypony w jednym miejscu: do jakiej przynęty, na jakie dno, z jakiego materiału
-          i kiedy realnie mają sens. Na górze masz też szybki filtr myślowy pod Plaine 2.
+          i kiedy mają sens. Dodałem też zdjęcia tam, gdzie udało się znaleźć sensowne i czytelne grafiki.
         </p>
       </div>
     </section>
@@ -58,50 +119,55 @@
     <section class="two-column">
       <article class="panel-card">
         <div class="section-head">
-          <h3>✅ Co ma sens na Plaine 2</h3>
+          <h3>✅ Najbardziej użyteczne na Plaine 2</h3>
           <span class="section-chip">praktycznie</span>
         </div>
 
         <div class="weather-interpretation">
-          <div class="weather-note status-success">Ronnie / Spinner Rig — bardzo dobry jako kij szukający z jasnym pop-upem.</div>
-          <div class="weather-note status-success">Hair Rig / Blowback / KD / German / Combi — mocne opcje na czyste miejsca, waftersy i twardsze przynęty.</div>
-          <div class="weather-note status-success">Solid Bag Rig — dobry awaryjnie, kiedy chcesz bardzo pewnie i czysto położyć zestaw.</div>
-          <div class="weather-note status-info">Slip D-Rig, Multi Rig i IQ D-Rig — dobre, jeśli chcesz bardziej dopracowaną prezentację na czystym dnie.</div>
-          <div class="weather-note status-info">Przy potencjalnych rakach i drobnicy lepiej mieć też opcję na twardszy hookbait i bardziej sztywny przypon.</div>
+          <div class="weather-note status-success">Hair Rig / Blowback / KD / German — bardzo dobra baza na czyste miejsca, tonące kulki i waftersy.</div>
+          <div class="weather-note status-success">Ronnie / Spinner Rig — świetny kij szukający z jasnym pop-upem.</div>
+          <div class="weather-note status-success">Multi Rig — bardzo praktyczny, gdy chcesz szybko wymieniać hak.</div>
+          <div class="weather-note status-success">Solid Bag Rig — bardzo dobra opcja awaryjna i porządne podanie zestawu.</div>
+          <div class="weather-note status-info">Hinged Stiff i D-Rigi mają sens, jeśli łowisz bardziej selektywnie i czysto.</div>
+          <div class="weather-note status-warn">Nie musisz brać 12 rigów. Lepiej mieć 4 naprawdę dopracowane niż 12 przypadkowych.</div>
         </div>
       </article>
 
       <article class="panel-card">
         <div class="section-head">
-          <h3>⚠️ Uważaj z tym na tym łowisku</h3>
-          <span class="section-chip">regulamin + sens</span>
+          <h3>⚠️ Co tu nie jest priorytetem</h3>
+          <span class="section-chip">sens + regulamin</span>
         </div>
 
         <div class="weather-interpretation">
-          <div class="weather-note status-danger">Chod Rig klasycznie na leadcore odpada, bo leadcore jest zabroniony.</div>
-          <div class="weather-note status-danger">360 Rig bywa kontrowersyjny i na wielu wodach jest niemile widziany — tutaj lepiej go po prostu odpuścić.</div>
-          <div class="weather-note status-warn">Zig Rig technicznie istnieje, ale na tej wodzie zwykle nie wygląda na priorytet.</div>
-          <div class="weather-note status-warn">Magic Twig, Recoil i inne „mechaniczne wynalazki” traktuj bardziej jako ciekawostkę niż plan podstawowy.</div>
-          <div class="weather-note status-warn">Na małej wodzie nie potrzebujesz 10 cudownych rigów — lepiej mieć 3–4 pewne i dopracowane.</div>
+          <div class="weather-note status-danger">Chod Rig w klasycznej wersji na leadcore odpada, bo leadcore jest zabroniony.</div>
+          <div class="weather-note status-warn">Zig Rig istnieje i działa, ale na tej wodzie zwykle nie wygląda na bazowy plan.</div>
+          <div class="weather-note status-warn">360 Rig i inne bardzo agresywne wynalazki lepiej zostawić jako ciekawostkę.</div>
+          <div class="weather-note status-warn">Mechaniczne patenty typu Magic Twig czy Recoil traktuj jako niszę, nie fundament.</div>
         </div>
       </article>
     </section>
 
     <section class="panel-card">
       <div class="section-head">
-        <h3>I. Przynęty tonące i zbalansowane</h3>
+        <h3>I. Przypony do przynęt tonących i zbalansowanych</h3>
         <span class="section-chip">bottom / wafters</span>
       </div>
 
       <div class="knowledge-grid">
         <article class="knowledge-card">
           <h3>🎣 Standard Hair Rig</h3>
-          <p class="muted">Klasyczny włos — fundament karpiarstwa.</p>
+          <p class="guide-kicker">Podstawa wszystkiego. Najbardziej naturalny i najbezpieczniejszy punkt wyjścia.</p>
+
+          <div class="guide-media">
+            <img src="https://www.anglingdirect.co.uk/media/wysiwyg/hair_rig_2.jpg" alt="Hair Rig - gotowy przypon z kulkami" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="guide-caption">Hair Rig — zdjęcie gotowego przyponu.</div>
+          </div>
+
           <ul>
-            <li><strong>Opis:</strong> prosty węzeł bez węzła, włos z pętelką</li>
             <li><strong>Dno:</strong> twarde, czyste</li>
             <li><strong>Przynęta:</strong> kulki tonące, pellet, kukurydza</li>
-            <li><strong>Hak:</strong> Wide Gape 4–8</li>
+            <li><strong>Hak:</strong> Wide Gape</li>
             <li><strong>Długość:</strong> 15–25 cm</li>
             <li><strong>Materiał:</strong> miękka plecionka</li>
           </ul>
@@ -109,9 +175,14 @@
 
         <article class="knowledge-card">
           <h3>🔁 Blowback Rig</h3>
-          <p class="muted">Jedna z najskuteczniejszych i najbardziej uniwersalnych opcji.</p>
+          <p class="guide-kicker">Jedna z najskuteczniejszych opcji na bałwanka i ostrożniejsze ryby.</p>
+
+          <div class="guide-media">
+            <img src="https://www.anglingdirect.co.uk/media/wysiwyg/blow_back_1.jpg" alt="Blowback Rig - gotowy przypon z bałwankiem" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="guide-caption">Blowback Rig — kółeczko na trzonku poprawia rotację haka.</div>
+          </div>
+
           <ul>
-            <li><strong>Opis:</strong> kółeczko na trzonku, przynęta odsuwa się przy wypluwaniu</li>
             <li><strong>Dno:</strong> uniwersalne</li>
             <li><strong>Przynęta:</strong> bałwanek, duże kulki tonące</li>
             <li><strong>Hak:</strong> Curve Shank lub Long Shank</li>
@@ -122,22 +193,20 @@
 
         <article class="knowledge-card">
           <h3>🪝 KD Rig</h3>
-          <p class="muted">Agresywna prezentacja, bardzo lubiana przy waftersach.</p>
+          <p class="guide-kicker">Bardzo agresywna geometria haka. Świetny do waftersów.</p>
           <ul>
-            <li><strong>Opis:</strong> włos wychodzi z węzła po 2 oplotach, hak wisi grotem w dół</li>
             <li><strong>Dno:</strong> piasek, lekki muł</li>
             <li><strong>Przynęta:</strong> wafters, tygrys z korkiem</li>
             <li><strong>Hak:</strong> Curve Shank</li>
-            <li><strong>Długość:</strong> 15–20 cm</li>
-            <li><strong>Materiał:</strong> bardzo miękka plecionka</li>
+            <li><strong>Długość:</strong> 12–18 cm</li>
+            <li><strong>Materiał:</strong> miękka plecionka</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>🇩🇪 German Rig</h3>
-          <p class="muted">Bardzo czysta, precyzyjna prezentacja bez klasycznego włosa.</p>
+          <p class="guide-kicker">Bardzo czysta i precyzyjna prezentacja bez klasycznego włosa.</p>
           <ul>
-            <li><strong>Opis:</strong> mikro-krętlik z wkrętką na trzonku haka</li>
             <li><strong>Dno:</strong> twarde, żwirowe</li>
             <li><strong>Przynęta:</strong> wafters, twarda kulka tonąca</li>
             <li><strong>Hak:</strong> Curve Shank</li>
@@ -148,12 +217,11 @@
 
         <article class="knowledge-card">
           <h3>D-Rig / IQ D-Rig</h3>
-          <p class="muted">Klasyk na czystą wodę i dopracowaną prezentację.</p>
+          <p class="guide-kicker">Klasyka na czystą wodę i bardzo dopracowaną prezentację.</p>
           <ul>
-            <li><strong>Opis:</strong> pętla „D” ze sztywnego materiału</li>
             <li><strong>Dno:</strong> bardzo czyste, żwir, piasek</li>
             <li><strong>Przynęta:</strong> wafters, docięte tonące kulki</li>
-            <li><strong>Hak:</strong> Chod Hook lub podobny model</li>
+            <li><strong>Hak:</strong> Chod Hook</li>
             <li><strong>Długość:</strong> 15–22 cm</li>
             <li><strong>Materiał:</strong> fluorocarbon</li>
           </ul>
@@ -161,53 +229,59 @@
 
         <article class="knowledge-card">
           <h3>🧩 Combi Rig</h3>
-          <p class="muted">Połączenie sztywności i naturalności.</p>
+          <p class="guide-kicker">Połączenie sztywności i naturalności. Bardzo rozsądny wybór „na pewniaka”.</p>
           <ul>
-            <li><strong>Opis:</strong> boom ze sztywnego materiału + miękka końcówka przy haku</li>
-            <li><strong>Dno:</strong> praktycznie każde, zwłaszcza gdy boisz się splątania</li>
+            <li><strong>Dno:</strong> praktycznie każde</li>
             <li><strong>Przynęta:</strong> bałwanek, kukurydza z pianką, wafters</li>
             <li><strong>Hak:</strong> Wide Gape</li>
-            <li><strong>Długość:</strong> 20–25 cm</li>
+            <li><strong>Długość:</strong> około 20–25 cm</li>
             <li><strong>Materiał:</strong> fluo + miękka plecionka</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>🎭 Muzza Rig</h3>
-          <p class="muted">Rig mocno nastawiony na maskowanie haka pod waftersem.</p>
+          <p class="guide-kicker">Rig nastawiony na bardzo niską, maskującą prezentację haka.</p>
           <ul>
-            <li><strong>Opis:</strong> docięty wafters układa hak grotem w dół</li>
             <li><strong>Dno:</strong> twarde, równe</li>
             <li><strong>Przynęta:</strong> wafters 12–14 mm</li>
             <li><strong>Hak:</strong> Curve Shank</li>
-            <li><strong>Długość:</strong> około 15 cm</li>
+            <li><strong>Długość:</strong> 12–15 cm</li>
             <li><strong>Materiał:</strong> miękka plecionka</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>🌀 Slip D-Rig</h3>
-          <p class="muted">Bardzo naturalna prezentacja waftersa.</p>
+          <p class="guide-kicker">Miękka i naturalna prezentacja waftersów.</p>
           <ul>
-            <li><strong>Opis:</strong> miękka pętla D ślizga się po trzonku haka</li>
-            <li><strong>Dno:</strong> czyste i średnio twarde</li>
+            <li><strong>Dno:</strong> czyste, średnio twarde</li>
             <li><strong>Przynęta:</strong> wafters</li>
-            <li><strong>Hak:</strong> Wide Gape / Curve Shank</li>
+            <li><strong>Hak:</strong> Curve Shank</li>
             <li><strong>Długość:</strong> 15–20 cm</li>
             <li><strong>Materiał:</strong> miękka lub półsztywna plecionka</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
-          <h3>🧠 Anti Eject Rig</h3>
-          <p class="muted">Rig nastawiony na utrudnienie wyplucia przynęty.</p>
+          <h3>🪶 The Flipper Rig</h3>
+          <p class="guide-kicker">Dłuższy włos daje mocne obracanie haka.</p>
           <ul>
-            <li><strong>Opis:</strong> odpowiednie ustawienie włosa i agresywna geometria haka</li>
-            <li><strong>Dno:</strong> twarde, czyste</li>
-            <li><strong>Przynęta:</strong> tonąca lub lekko zbalansowana</li>
-            <li><strong>Hak:</strong> Curve Shank / Wide Gape</li>
-            <li><strong>Długość:</strong> 15–20 cm</li>
-            <li><strong>Materiał:</strong> miękka lub otulinowa plecionka</li>
+            <li><strong>Dno:</strong> twarde</li>
+            <li><strong>Przynęta:</strong> duża tonąca kulka</li>
+            <li><strong>Hak:</strong> Curve Shank</li>
+            <li><strong>Długość:</strong> 20–25 cm</li>
+          </ul>
+        </article>
+
+        <article class="knowledge-card">
+          <h3>⚖️ Beausoleil Rig</h3>
+          <p class="guide-kicker">Patent na bardzo cwane ryby i bardziej wyrafinowaną prezentację.</p>
+          <ul>
+            <li><strong>Dno:</strong> czyste, twarde</li>
+            <li><strong>Przynęta:</strong> orzech, kulka</li>
+            <li><strong>Hak:</strong> Wide Gape</li>
+            <li><strong>Długość:</strong> 15–18 cm</li>
           </ul>
         </article>
       </div>
@@ -215,86 +289,107 @@
 
     <section class="panel-card">
       <div class="section-head">
-        <h3>II. Przynęty pływające</h3>
-        <span class="section-chip">pop-up</span>
+        <h3>II. Przypony do pop-upów</h3>
+        <span class="section-chip">pływające</span>
       </div>
 
       <div class="knowledge-grid">
         <article class="knowledge-card">
           <h3>🚀 Ronnie Rig / Spinner Rig</h3>
-          <p class="muted">Absolutny hit ostatnich lat.</p>
+          <p class="guide-kicker">Najbardziej znany pop-up rig ostatnich lat. Bardzo mocna opcja na kij szukający.</p>
+
+          <div class="guide-media">
+            <img src="https://www.anglingdirect.co.uk/media/wysiwyg/ronnie_rig.jpg" alt="Ronnie Rig - gotowy przypon z pop-upem" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="guide-caption">Ronnie Rig — gotowy zestaw z pop-upem.</div>
+          </div>
+
           <ul>
-            <li><strong>Opis:</strong> hak na krętliku Quick Change / Spinner, pełna rotacja</li>
             <li><strong>Dno:</strong> twarde, piasek, niski dywan roślinny</li>
             <li><strong>Przynęta:</strong> pop-up blisko dna</li>
-            <li><strong>Hak:</strong> specjalny Curve Shank / spinner hook</li>
-            <li><strong>Długość:</strong> zwykle krótki boom około 15 cm</li>
-            <li><strong>Materiał:</strong> sztywny boom lub fluo</li>
+            <li><strong>Hak:</strong> Curve Shank / spinner hook</li>
+            <li><strong>Długość:</strong> krótki boom około 15 cm</li>
+            <li><strong>Wysokość pop-upa:</strong> zwykle 2–4 cm</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>☁️ Chod Rig</h3>
-          <p class="muted">Rig na dno, którego nie znasz lub muł / śmieci.</p>
+          <p class="guide-kicker">Na muł, śmieci i dno, którego nie znasz.</p>
           <ul>
-            <li><strong>Opis:</strong> bardzo krótki, sztywny, wygięty przypon pod wypornego pop-upa</li>
-            <li><strong>Dno:</strong> ziele, liście, muł</li>
+            <li><strong>Dno:</strong> muł, liście, ziele</li>
             <li><strong>Przynęta:</strong> mocno wyporny pop-up</li>
             <li><strong>Hak:</strong> Chod Hook</li>
             <li><strong>Długość:</strong> 3–6 cm</li>
-            <li><strong>Materiał:</strong> sztywna żyłka typu Mouthtrap</li>
+            <li><strong>Materiał:</strong> sztywna żyłka chod</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>🦴 Hinged Stiff Rig</h3>
-          <p class="muted">Klasyka pod większe ryby i bardzo czyste prezentacje.</p>
+          <p class="guide-kicker">Klasyka pod większe ryby i bardzo czyste prezentacje.</p>
+
+          <div class="guide-media">
+            <img src="https://www.anglingdirect.co.uk/media/wysiwyg/hinge_stiff_rig_1.jpg" alt="Hinged Stiff Rig - gotowy przypon pop-up" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="guide-caption">Hinged Stiff Rig — dwusekcyjna prezentacja pod pop-up.</div>
+          </div>
+
           <ul>
-            <li><strong>Opis:</strong> boom + krótka sekcja chod z przegubem</li>
             <li><strong>Dno:</strong> czyste, żwirowe</li>
             <li><strong>Przynęta:</strong> pop-up 5–8 cm nad dnem</li>
             <li><strong>Hak:</strong> Chod Hook</li>
             <li><strong>Długość:</strong> około 25 cm całość</li>
-            <li><strong>Materiał:</strong> sztywny boom + chod filament</li>
+            <li><strong>Materiał:</strong> boom + sekcja chod</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>🔄 Multi Rig</h3>
-          <p class="muted">Bardzo praktyczny, bo hak wymieniasz błyskawicznie.</p>
+          <p class="guide-kicker">Bardzo praktyczny, bo hak wymieniasz błyskawicznie.</p>
+
+          <div class="guide-media">
+            <img src="https://www.anglingdirect.co.uk/media/catalog/product/cache/38362d79e1d7dc745475407d4f225fd7/n/a/nash_multi_rig_1_1.jpg" alt="Multi Rig - gotowy przypon na opakowaniu" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="guide-caption">Multi Rig — gotowy przypon z szybkim systemem wymiany haka.</div>
+          </div>
+
           <ul>
-            <li><strong>Opis:</strong> pętla przez oczko haka, szybka wymiana bez wiązania od nowa</li>
             <li><strong>Dno:</strong> praktycznie każde</li>
             <li><strong>Przynęta:</strong> pop-up, bałwanek</li>
             <li><strong>Hak:</strong> Chod Hook lub Curve Shank</li>
             <li><strong>Długość:</strong> 15–20 cm</li>
-            <li><strong>Materiał:</strong> sztywna otulina lub półsztywny materiał</li>
+            <li><strong>Wysokość pop-upa:</strong> zwykle 3–5 cm</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
           <h3>🧷 Withy Pool Rig</h3>
-          <p class="muted">Bardzo agresywna rotacja haka.</p>
+          <p class="guide-kicker">Bardzo agresywna geometria z długą termokurczką.</p>
           <ul>
-            <li><strong>Opis:</strong> długa rurka termokurczliwa wygięta w półkole</li>
             <li><strong>Dno:</strong> twarde, lekki muł</li>
             <li><strong>Przynęta:</strong> pop-up</li>
             <li><strong>Hak:</strong> Long Shank</li>
             <li><strong>Długość:</strong> 15–20 cm</li>
-            <li><strong>Materiał:</strong> sztywny lub półsztywny boom</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
-          <h3>🧊 Naked Chod</h3>
-          <p class="muted">Wersja chod riga bez leadcore.</p>
+          <h3>🍜 The Noodle</h3>
+          <p class="guide-kicker">Miększa wersja Withy Pool z jeszcze bardziej agresywną rotacją.</p>
           <ul>
-            <li><strong>Opis:</strong> chod przesuwający się bezpośrednio po żyłce / leaderze zgodnym z regulaminem</li>
-            <li><strong>Dno:</strong> śmieci, lekki muł, niepewne podłoże</li>
-            <li><strong>Przynęta:</strong> mocno wyporny pop-up</li>
-            <li><strong>Hak:</strong> Chod Hook</li>
-            <li><strong>Długość:</strong> 3–6 cm sekcja chod</li>
-            <li><strong>Materiał:</strong> sztywna żyłka chod</li>
+            <li><strong>Dno:</strong> twarde</li>
+            <li><strong>Przynęta:</strong> pop-up</li>
+            <li><strong>Hak:</strong> Curve Shank</li>
+            <li><strong>Wysokość pop-upa:</strong> 4–6 cm</li>
+          </ul>
+        </article>
+
+        <article class="knowledge-card">
+          <h3>🧼 Naked Ronnie</h3>
+          <p class="guide-kicker">Bardziej „goła” i subtelna wersja Ronniego.</p>
+          <ul>
+            <li><strong>Dno:</strong> miększe, lekki muł</li>
+            <li><strong>Przynęta:</strong> pop-up</li>
+            <li><strong>Hak:</strong> Curve Shank</li>
+            <li><strong>Wysokość pop-upa:</strong> 2–4 cm</li>
           </ul>
         </article>
       </div>
@@ -302,60 +397,21 @@
 
     <section class="panel-card">
       <div class="section-head">
-        <h3>III. Mechaniczne i specjalistyczne</h3>
-        <span class="section-chip">specjalne zastosowania</span>
+        <h3>III. Przypony specjalistyczne i mechaniczne</h3>
+        <span class="section-chip">nisza / techniczne</span>
       </div>
 
       <div class="knowledge-grid">
         <article class="knowledge-card">
-          <h3>⚙️ Magic Twig</h3>
-          <p class="muted">Mechaniczny „spust”. Bardziej ciekawostka niż baza.</p>
-          <ul>
-            <li><strong>Opis:</strong> urządzenie wbija hak mechanicznie po wyprostowaniu przyponu</li>
-            <li><strong>Dno:</strong> twarde</li>
-            <li><strong>Przynęta:</strong> różna</li>
-            <li><strong>Hak:</strong> mocny model</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>🪀 Recoil Rig / Bungee Rig</h3>
-          <p class="muted">Gumowy element ma utrudniać wyplucie przynęty.</p>
-          <ul>
-            <li><strong>Opis:</strong> fragment gumy wewnątrz przyponu</li>
-            <li><strong>Dno:</strong> bardzo czyste</li>
-            <li><strong>Przynęta:</strong> kulka tonąca</li>
-            <li><strong>Długość:</strong> około 20 cm</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>🧭 Flipper Rig</h3>
-          <p class="muted">Długi włos i sterująca geometria przynęty.</p>
-          <ul>
-            <li><strong>Opis:</strong> przynęta działa jak ster i obraca hak</li>
-            <li><strong>Dno:</strong> twarde</li>
-            <li><strong>Przynęta:</strong> duża kulka tonąca</li>
-            <li><strong>Hak:</strong> Curve Shank</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>🪱 Mag-Aligner</h3>
-          <p class="muted">Rig pod białe robaki / mady.</p>
-          <ul>
-            <li><strong>Opis:</strong> pozycjoner imituje larwę, hak znika w pęku robaków</li>
-            <li><strong>Dno:</strong> piasek, glina, twarde podłoże</li>
-            <li><strong>Przynęta:</strong> mady</li>
-            <li><strong>Hak:</strong> mały Wide Gape 8–10</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
           <h3>🪣 Solid Bag Rig</h3>
-          <p class="muted">Jeden z najbardziej praktycznych rigów specjalnych.</p>
+          <p class="guide-kicker">Jeden z najbardziej praktycznych „specjalistycznych” rigów.</p>
+
+          <div class="guide-media">
+            <img src="https://www.anglingdirect.co.uk/media/catalog/product/cache/ac527c7582b02617b1ecdcb3739644c7/n/a/nash_solid_bag_rig_1_1.jpg" alt="Solid Bag Rig - gotowy przypon" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="guide-caption">Solid Bag Rig — krótki przypon do worków PVA.</div>
+          </div>
+
           <ul>
-            <li><strong>Opis:</strong> bardzo krótki przypon chowany do worka PVA</li>
             <li><strong>Dno:</strong> praktycznie każde</li>
             <li><strong>Przynęta:</strong> mały wafters, sztuczna kukurydza, mały pop-up</li>
             <li><strong>Hak:</strong> Wide Gape 4–6</li>
@@ -364,101 +420,54 @@
         </article>
 
         <article class="knowledge-card">
-          <h3>🌊 Zig Rig</h3>
-          <p class="muted">Rig do łowienia w toni.</p>
+          <h3>⚙️ Magic Twig</h3>
+          <p class="guide-kicker">Mechaniczny „spust” bardziej dla technicznych eksperymentów niż bazy.</p>
           <ul>
-            <li><strong>Opis:</strong> bardzo długi przypon z pianką lub korkiem</li>
-            <li><strong>Dno:</strong> nie ma znaczenia, bo łowisz w toni</li>
-            <li><strong>Przynęta:</strong> pianka Zig Foam, korek</li>
+            <li><strong>Dno:</strong> twarde</li>
+            <li><strong>Przynęta:</strong> różna</li>
+            <li><strong>Plus:</strong> bardzo agresywna reakcja</li>
+            <li><strong>Minus:</strong> niszowy patent</li>
+          </ul>
+        </article>
+
+        <article class="knowledge-card">
+          <h3>🪀 Recoil / Bungee Rig</h3>
+          <p class="guide-kicker">Wstawka z gumy ma utrudniać wyplucie przynęty.</p>
+          <ul>
+            <li><strong>Dno:</strong> bardzo czyste</li>
+            <li><strong>Przynęta:</strong> kulka tonąca</li>
+            <li><strong>Długość:</strong> około 20 cm</li>
+          </ul>
+        </article>
+
+        <article class="knowledge-card">
+          <h3>🌊 Zig Rig</h3>
+          <p class="guide-kicker">Łowienie w toni, nie przy dnie.</p>
+          <ul>
+            <li><strong>Dno:</strong> nieistotne</li>
+            <li><strong>Przynęta:</strong> pianka, korkowe kulki</li>
             <li><strong>Hak:</strong> mały 10–12</li>
             <li><strong>Długość:</strong> od 1 m do nawet 6 m</li>
           </ul>
         </article>
 
         <article class="knowledge-card">
+          <h3>🪱 Mag-Aligner</h3>
+          <p class="guide-kicker">Rig pod mady i bardziej naturalne wabienie.</p>
+          <ul>
+            <li><strong>Dno:</strong> piasek, glina, twarde podłoże</li>
+            <li><strong>Przynęta:</strong> białe robaki</li>
+            <li><strong>Hak:</strong> mały Wide Gape 8–10</li>
+          </ul>
+        </article>
+
+        <article class="knowledge-card">
           <h3>🌽 Wishbone Rig</h3>
-          <p class="muted">Rozwidlenie włosa pod dwie przynęty obok siebie.</p>
+          <p class="guide-kicker">Dwa włosy na jednym haku, miks przynęt i kolorów.</p>
           <ul>
-            <li><strong>Opis:</strong> włos w układzie „widełek”</li>
             <li><strong>Dno:</strong> twarde</li>
-            <li><strong>Przynęta:</strong> miks typu kukurydza + orzech, dwa kolory</li>
-            <li><strong>Hak:</strong> Wide Gape / uniwersalny</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>⭕ 360 Rig</h3>
-          <p class="muted">Słynny rig o bardzo agresywnej pracy, ale kontrowersyjny.</p>
-          <ul>
-            <li><strong>Opis:</strong> hak pracujący pełnym obrotem na krętliku</li>
-            <li><strong>Dno:</strong> czyste, twarde</li>
-            <li><strong>Przynęta:</strong> pop-up</li>
-            <li><strong>Uwaga:</strong> sprawdza się technicznie, ale na wielu wodach jest niemile widziany</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="panel-card">
-      <div class="section-head">
-        <h3>IV. Niszowe i hobbystyczne patenty</h3>
-        <span class="section-chip">ciekawostki</span>
-      </div>
-
-      <div class="knowledge-grid">
-        <article class="knowledge-card">
-          <h3>🍜 The Noodle Rig</h3>
-          <p class="muted">Dłuższa, miękka rurka daje bardzo mocną rotację.</p>
-          <ul>
-            <li><strong>Opis:</strong> odmiana Withy z dłuższą rurką</li>
-            <li><strong>Plus:</strong> bardzo agresywne obracanie haka</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>⚫ Shot on the Hook</h3>
-          <p class="muted">Śrucina na łuku haka ma obciążyć grot.</p>
-          <ul>
-            <li><strong>Opis:</strong> mały ciężarek przy haku</li>
-            <li><strong>Plus:</strong> szybsze opadanie grotu</li>
-            <li><strong>Minus:</strong> trzeba uważać, żeby nie przesadzić</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>🦅 The Claw Rig</h3>
-          <p class="muted">Geometria „pazura” pod bardzo ostrożne ryby.</p>
-          <ul>
-            <li><strong>Opis:</strong> pozycjoner + termokurczka w agresywnym kształcie</li>
-            <li><strong>Zastosowanie:</strong> ryby delikatnie zasysające przynętę</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>⚖️ Beausoleil Rig</h3>
-          <p class="muted">Dociążenie włosa ogranicza kołysanie przynęty.</p>
-          <ul>
-            <li><strong>Opis:</strong> balansowanie włosa w połowie długości</li>
-            <li><strong>Zastosowanie:</strong> bardziej naturalna praca przy wypluwaniu</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>🛩️ Turbo Prop Rig</h3>
-          <p class="muted">Małe śmigiełko przed przynętą.</p>
-          <ul>
-            <li><strong>Opis:</strong> dodatkowa wibracja przy ruchu wody</li>
-            <li><strong>Zastosowanie:</strong> ciekawostka, bardziej do eksperymentów niż do planu podstawowego</li>
-          </ul>
-        </article>
-
-        <article class="knowledge-card">
-          <h3>🧪 Co z tym zrobić?</h3>
-          <p class="muted">Najlepsze podejście:</p>
-          <ul>
-            <li>znać te rigy jako ciekawostkę</li>
-            <li>nie budować na nich podstawowego planu wyjazdu</li>
-            <li>trzymać bazę na sprawdzonych przyponach</li>
+            <li><strong>Przynęta:</strong> np. kukurydza + orzech</li>
+            <li><strong>Zastosowanie:</strong> ciekawsza prezentacja</li>
           </ul>
         </article>
       </div>
@@ -471,12 +480,12 @@
           <span class="section-chip">minimum</span>
         </div>
 
-        <div class="weather-interpretation">
+        <div class="guide-note-box">
           <div class="weather-note status-success">Hair Rig / Blowback Rig</div>
           <div class="weather-note status-success">KD Rig albo German Rig</div>
           <div class="weather-note status-success">Ronnie / Spinner Rig</div>
+          <div class="weather-note status-success">Multi Rig</div>
           <div class="weather-note status-success">Solid Bag Rig</div>
-          <div class="weather-note status-info">Multi Rig jako zapasowa opcja pod pop-up</div>
         </div>
       </article>
 
@@ -486,11 +495,11 @@
           <span class="section-chip">na wodzie</span>
         </div>
 
-        <div class="weather-interpretation">
-          <div class="weather-note status-warn">Nie bierz 15 rigów, jeśli realnie użyjesz 3.</div>
-          <div class="weather-note status-warn">Nie zmieniaj codziennie wszystkiego naraz.</div>
+        <div class="guide-note-box">
+          <div class="weather-note status-warn">Nie bierz 15 rigów, jeśli realnie użyjesz 4–5.</div>
+          <div class="weather-note status-warn">Nie zmieniaj wszystkiego naraz po jednej cichej nocy.</div>
           <div class="weather-note status-info">Lepiej mieć gotowe przypony w kilku wersjach niż improwizować przy braniu.</div>
-          <div class="weather-note status-success">Na tej wodzie bardziej wygrywa dopracowanie niż „sekretne wynalazki”.</div>
+          <div class="weather-note status-success">Na tej wodzie wygrywa dopracowanie, nie egzotyka.</div>
         </div>
       </article>
     </section>

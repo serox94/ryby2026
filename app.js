@@ -1303,30 +1303,92 @@ function updateDashboard(catches, spots = [], checklist = []) {
     }
   }
 
-  const ctx = document.getElementById("fishChart");
-  if (ctx && window.Chart) {
+  const chartCanvas = document.getElementById("fishChart");
+if (chartCanvas && window.Chart) {
+  const chartCtx = chartCanvas.getContext("2d");
+  if (chartCtx) {
     const labels = ["Patryk", "Maciek"];
-    const values = labels.map(name => catches.filter(item => item.person === name).reduce((sum, item) => sum + Number(item.weight || 0), 0));
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new window.Chart(ctx, {
-      type: "bar",
+    const weightValues = labels.map(name =>
+      catches
+        .filter(item => item.person === name)
+        .reduce((sum, item) => sum + Number(item.weight || 0), 0)
+    );
+
+    const countValues = labels.map(name =>
+      catches.filter(item => item.person === name).length
+    );
+
+    if (chartInstance) {
+      chartInstance.destroy();
+      chartInstance = null;
+    }
+
+    chartInstance = new window.Chart(chartCtx, {
       data: {
         labels,
-        datasets: [{
-          label: "Łączna waga ryb (kg)",
-          data: values,
-          backgroundColor: ["rgba(73,166,255,0.7)", "rgba(61,220,151,0.7)"],
-          borderRadius: 8
-        }]
+        datasets: [
+          {
+            type: "bar",
+            label: "Łączna waga ryb (kg)",
+            data: weightValues,
+            backgroundColor: ["rgba(73,166,255,0.72)", "rgba(61,220,151,0.72)"],
+            borderColor: ["rgba(73,166,255,1)", "rgba(61,220,151,1)"],
+            borderWidth: 1,
+            borderRadius: 10,
+            yAxisID: "y"
+          },
+          {
+            type: "line",
+            label: "Liczba ryb",
+            data: countValues,
+            borderColor: "rgba(255,215,120,1)",
+            backgroundColor: "rgba(255,215,120,0.2)",
+            tension: 0.25,
+            fill: false,
+            pointRadius: 5,
+            pointHoverRadius: 6,
+            yAxisID: "y1"
+          }
+        ]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: "#dfe7f2"
+            }
+          }
+        },
         scales: {
           y: {
             beginAtZero: true,
             ticks: {
+              color: "#aeb9c9",
               callback: value => `${value} kg`
+            },
+            grid: {
+              color: "rgba(255,255,255,0.06)"
+            }
+          },
+          y1: {
+            beginAtZero: true,
+            position: "right",
+            ticks: {
+              precision: 0,
+              color: "#aeb9c9"
+            },
+            grid: {
+              drawOnChartArea: false
+            }
+          },
+          x: {
+            ticks: {
+              color: "#aeb9c9"
+            },
+            grid: {
+              color: "rgba(255,255,255,0.04)"
             }
           }
         }

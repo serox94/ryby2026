@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ryby 2026 | Mapa spotów / dna</title>
+  <script>
+    (function () {
+      try {
+        var key = localStorage.getItem("ryby2026_auth_v1");
+        document.documentElement.classList.add(key === "ok" ? "auth-ready" : "auth-locked");
+      } catch (e) {
+        document.documentElement.classList.add("auth-locked");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../ui-plus.css" />
   <link rel="stylesheet" href="../media-plus.css" />
@@ -114,9 +124,7 @@
             </div>
 
             <div>
-              <label for="spot-image-url">Link do szkicu / zdjęcia</label>
-              <input type="url" id="spot-image-url" maxlength="300" placeholder="https://..." />
-            </div>
+</div>
           </div>
 
           <div>
@@ -157,6 +165,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../auth.js"></script>
   <script src="../app.js"></script>
   <script src="../app-plus.js"></script>
 </body>

@@ -326,11 +326,6 @@
       const bestBait = getMode(baits, "Brak danych");
       const bestSpot = getMode(spotNames, "Brak danych");
       const openChecklist = checklistItems.filter((item) => !item.done).length;
-      const latestText = latestCatch
-        ? `${normalizeTextSafe(latestCatch.person, 30)} • ${normalizeTextSafe(latestCatch.species, 40)} • ${Number(latestCatch.weight).toFixed(1)} kg • ${formatDateTimePL(latestCatch.caught_at)}`
-        : "Brak zapisanych połowów.";
-
-      setText("last-entry", latestText);
       setText("dashboard-last-fish", latestCatch ? `${Number(latestCatch.weight).toFixed(1)} kg` : "Brak");
       setText("dashboard-best-day", bestDay);
       setText("dashboard-best-hour", bestHour);

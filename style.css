@@ -345,6 +345,39 @@ img {
   color: var(--muted);
 }
 
+
+.last-entry-list {
+  display: grid;
+  gap: 12px;
+}
+
+.last-entry-item {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(16, 23, 34, 0.82);
+}
+
+.last-entry-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.last-entry-weight {
+  color: var(--accent-2);
+  font-weight: 800;
+}
+
+.last-entry-meta {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .quick-links {
   display: grid;
   gap: 10px;

@@ -1,6 +1,8 @@
 const TRIP_START = new Date("2026-06-20T14:00:00");
 const TRIP_END = new Date("2026-06-27T10:00:00");
-const PB_TARGET = 20;
+const PB_TARGET = 13;
+const PB_SOUND_THRESHOLD = 13;
+const PB_CELEBRATION_STORAGE_KEY = "ryby2026_pb_celebrated_catches";
 
 const SUPABASE_URL = "https://baiepgxqnppwokcmmpqw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ziiHPrhOisVJXnUeOdI4ug_b4y4djws";
@@ -52,6 +54,7 @@ let checklistFormBound = false;
 let spotsFormBound = false;
 let weatherEventsBound = false;
 let chartInstance = null;
+let pbCelebrationPrimed = false;
 
 function $(id) {
   return document.getElementById(id);
@@ -116,6 +119,94 @@ function formatDay(value) {
     month: "2-digit"
   });
 }
+
+function getPbCatchKey(item) {
+  return String(item?.id ?? `${normalizeText(item?.person, 30)}-${item?.caught_at || ""}-${Number(item?.weight || 0).toFixed(2)}`);
+}
+
+function getCelebratedPbCatchKeys() {
+  try {
+    const raw = window.localStorage.getItem(PB_CELEBRATION_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveCelebratedPbCatchKeys(keys) {
+  try {
+    window.localStorage.setItem(PB_CELEBRATION_STORAGE_KEY, JSON.stringify([...new Set(keys.map(String))].slice(-250)));
+  } catch (_) {}
+}
+
+function playPbCelebrationSound() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+
+    const ctx = new AudioCtx();
+    const startAt = ctx.currentTime + 0.02;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+
+    notes.forEach((freq, index) => {
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(freq, startAt + index * 0.11);
+
+      gain.gain.setValueAtTime(0.0001, startAt + index * 0.11);
+      gain.gain.exponentialRampToValueAtTime(0.07, startAt + index * 0.11 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + index * 0.11 + 0.22);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start(startAt + index * 0.11);
+      oscillator.stop(startAt + index * 0.11 + 0.24);
+    });
+
+    window.setTimeout(() => {
+      try { ctx.close(); } catch (_) {}
+    }, 900);
+  } catch (_) {}
+}
+
+function celebrateCatchIfNeeded(item, { play = true } = {}) {
+  if (!item || Number(item.weight || 0) < PB_SOUND_THRESHOLD) return false;
+
+  const key = getPbCatchKey(item);
+  const storedKeys = new Set(getCelebratedPbCatchKeys());
+  if (storedKeys.has(key)) return false;
+
+  storedKeys.add(key);
+  saveCelebratedPbCatchKeys([...storedKeys]);
+  if (play) playPbCelebrationSound();
+  return true;
+}
+
+function maybeCelebratePbMilestone(catches) {
+  if (!Array.isArray(catches) || !catches.length) return;
+
+  const qualifying = catches.filter(item => Number(item.weight || 0) >= PB_SOUND_THRESHOLD);
+  if (!qualifying.length) return;
+
+  const storedKeys = new Set(getCelebratedPbCatchKeys());
+
+  if (!pbCelebrationPrimed) {
+    qualifying.forEach(item => storedKeys.add(getPbCatchKey(item)));
+    saveCelebratedPbCatchKeys([...storedKeys]);
+    pbCelebrationPrimed = true;
+    return;
+  }
+
+  const fresh = qualifying.filter(item => !storedKeys.has(getPbCatchKey(item)));
+  if (!fresh.length) return;
+
+  fresh.forEach(item => storedKeys.add(getPbCatchKey(item)));
+  saveCelebratedPbCatchKeys([...storedKeys]);
+  playPbCelebrationSound();
+}
+
 
 function setMessage(id, message, type = "") {
   const box = $(id);
@@ -435,10 +526,20 @@ async function handleCatchSubmit(event) {
   setMessage("form-message", editId ? "Zapisywanie zmian..." : "Zapisywanie połowu...");
 
   let error;
+  let savedCatch = null;
   if (editId) {
-    ({ error } = await supabaseClient.from("catches").update(validation.payload).eq("id", Number(editId)));
+    ({ data: savedCatch, error } = await supabaseClient
+      .from("catches")
+      .update(validation.payload)
+      .eq("id", Number(editId))
+      .select("id, person, weight, caught_at")
+      .single());
   } else {
-    ({ error } = await supabaseClient.from("catches").insert([validation.payload]));
+    ({ data: savedCatch, error } = await supabaseClient
+      .from("catches")
+      .insert([validation.payload])
+      .select("id, person, weight, caught_at")
+      .single());
   }
 
   if (error) {
@@ -446,6 +547,8 @@ async function handleCatchSubmit(event) {
     setMessage("form-message", editId ? "Nie udało się zapisać zmian." : "Nie udało się dodać połowu.", "error");
     return;
   }
+
+  if (savedCatch) celebrateCatchIfNeeded(savedCatch, { play: true });
 
   setMessage("form-message", editId ? "Zmiany zapisane." : "Połów został dodany.", "success");
   resetCatchForm();
@@ -1381,18 +1484,31 @@ function updateDashboard(catches, spots = [], checklist = []) {
   const lastEntryBox = $("last-entry");
   if (lastEntryBox) {
     clearNode(lastEntryBox);
+    lastEntryBox.classList.remove("last-entry-list");
     if (!catches.length) {
       lastEntryBox.textContent = "Brak zapisanych połowów.";
     } else {
-      const sorted = [...catches].sort((a, b) => new Date(b.caught_at) - new Date(a.caught_at));
-      const item = sorted[0];
-      lastEntryBox.appendChild(el("div", "", `${item.person} - ${item.species}`));
-      lastEntryBox.appendChild(el("div", "", `Waga: ${Number(item.weight).toFixed(1)} kg`));
-      lastEntryBox.appendChild(el("div", "", `Przynęta: ${normalizeText(item.bait, 50)}`));
-      lastEntryBox.appendChild(el("div", "", `Spot: ${getSpotDisplayName(item, spots)}`));
-      lastEntryBox.appendChild(el("div", "", `Data: ${formatCaughtAt(item.caught_at)}`));
+      lastEntryBox.classList.add("last-entry-list");
+      const sorted = [...catches].sort((a, b) => new Date(b.caught_at) - new Date(a.caught_at)).slice(0, 3);
+
+      sorted.forEach(item => {
+        const card = el("article", "last-entry-item");
+        const top = el("div", "last-entry-top");
+        top.appendChild(el("strong", "", `${item.person} - ${item.species}`));
+        top.appendChild(el("span", "last-entry-weight", `${Number(item.weight).toFixed(1)} kg`));
+
+        const meta = el("div", "last-entry-meta");
+        meta.appendChild(el("span", "", `Przynęta: ${normalizeText(item.bait, 50)}`));
+        meta.appendChild(el("span", "", `Spot: ${getSpotDisplayName(item, spots)}`));
+        meta.appendChild(el("span", "", formatCaughtAt(item.caught_at)));
+
+        card.append(top, meta);
+        lastEntryBox.appendChild(card);
+      });
     }
   }
+
+  maybeCelebratePbMilestone(catches);
 
   const ctx = document.getElementById("fishChart");
   if (typeof window.renderDashboardExtras === "function") {

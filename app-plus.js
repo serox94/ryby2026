@@ -927,15 +927,12 @@
 
       const deleteBtn = createNode("button", "danger-btn", "Usuń");
       deleteBtn.type = "button";
-      deleteBtn.addEventListener("click", async () => {
-        if (!window.supabaseClient) return;
-        if (!window.confirm("Usunąć ten spot?")) return;
-        const { error } = await supabaseClient.from("spots").delete().eq("id", item.id);
-        if (error) {
-          window.alert("Nie udało się usunąć spotu.");
+      deleteBtn.addEventListener("click", () => {
+        if (typeof window.deleteSpot === "function") {
+          window.deleteSpot(item.id);
           return;
         }
-        await renderSpotsPagePlus();
+        window.alert("Brak funkcji usuwania spotu.");
       });
 
       actions.append(editBtn, deleteBtn);
@@ -998,10 +995,6 @@
     if (!$("spot-form")) return;
     if ($("spot-form").dataset.plusBound === "1") return;
     $("spot-form").dataset.plusBound = "1";
-
-    $("spot-form").addEventListener("submit", handleSpotSubmitPlus);
-    $("refresh-spots-btn")?.addEventListener("click", renderSpotsPagePlus);
-    $("cancel-edit-spot-btn")?.addEventListener("click", resetSpotFormPlus);
   }
 
   function enhanceWeatherPageStatuses() {
@@ -1071,27 +1064,18 @@
 
   function initDashboardPlus() {
     ensureDashboardExtraGrid();
-    renderDashboardExtras();
   }
 
   function initChecklistPlus() {
     if (!$("checklist-groups")) return;
     ensureChecklistToolbar();
     bindChecklistPlusEvents();
-    renderChecklistPagePlus();
-
-    if ($("checklist-form")) {
-      $("checklist-form").addEventListener("submit", () => {
-        setTimeout(renderChecklistPagePlus, 500);
-      }, true);
-    }
   }
 
   function initMapPlus() {
     if (!$("spots-list")) return;
     ensureMapExtras();
     bindSpotsPageEventsPlus();
-    renderSpotsPagePlus();
   }
 
   function initGeneralStatuses() {
@@ -1105,6 +1089,10 @@
     initMapPlus();
     initGeneralStatuses();
   }
+
+  window.renderDashboardExtras = renderDashboardExtras;
+  window.renderChecklistPagePlus = renderChecklistPagePlus;
+  window.renderSpotsPagePlus = renderSpotsPagePlus;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initPlus);

@@ -8,6 +8,8 @@ const supabaseClient = window.supabase
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   : null;
 
+window.supabaseClient = supabaseClient;
+
 const FISHING_SPOT = {
   name: "LodgingCarp - La Plaine des Bois 2",
   latitude: 47.621,
@@ -123,6 +125,17 @@ function setMessage(id, message, type = "") {
   if (type) box.classList.add(type);
 }
 
+async function getSpotNameById(spotId) {
+  const parsedId = Number(spotId);
+  if (!Number.isFinite(parsedId) || !supabaseClient) return "";
+  const { data, error } = await supabaseClient.from("spots").select("name").eq("id", parsedId).maybeSingle();
+  if (error) {
+    console.error("Błąd pobrania nazwy spotu:", error.message);
+    return "";
+  }
+  return normalizeText(data?.name || "", 80);
+}
+
 function updateCountdown() {
   const countdownEl = $("countdown");
   if (!countdownEl) return;
@@ -152,6 +165,11 @@ function setupMobileMenu() {
 
   toggleBtn.dataset.bound = "1";
 
+  const closeMenu = () => {
+    nav.classList.remove("open");
+    toggleBtn.setAttribute("aria-expanded", "false");
+  };
+
   toggleBtn.addEventListener("click", () => {
     nav.classList.toggle("open");
     const expanded = nav.classList.contains("open");
@@ -159,10 +177,17 @@ function setupMobileMenu() {
   });
 
   nav.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-      nav.classList.remove("open");
-      toggleBtn.setAttribute("aria-expanded", "false");
-    });
+    link.addEventListener("click", closeMenu);
+  });
+
+  document.addEventListener("click", event => {
+    if (!nav.classList.contains("open")) return;
+    if (nav.contains(event.target) || toggleBtn.contains(event.target)) return;
+    closeMenu();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeMenu();
   });
 }
 
@@ -382,13 +407,20 @@ async function handleCatchSubmit(event) {
   event.preventDefault();
   if (!supabaseClient) return;
 
+  const selectedSpotId = $("spot-id")?.value;
+  let resolvedSpotText = normalizeText($("spot")?.value, 80);
+  if (!resolvedSpotText && selectedSpotId) {
+    resolvedSpotText = await getSpotNameById(selectedSpotId);
+    if (resolvedSpotText && $("spot")) $("spot").value = resolvedSpotText;
+  }
+
   const formValues = {
     person: $("person")?.value,
     species: $("species")?.value,
     weight: $("weight")?.value,
     bait: $("bait")?.value,
-    spot: $("spot")?.value,
-    spot_id: $("spot-id")?.value,
+    spot: resolvedSpotText,
+    spot_id: selectedSpotId,
     note: $("note")?.value,
     caught_at: $("caught_at")?.value
   };
@@ -694,6 +726,12 @@ function renderChecklistGroups(items) {
 async function renderChecklistPage() {
   const container = $("checklist-groups");
   if (!container) return;
+
+  if (typeof window.renderChecklistPagePlus === "function") {
+    await window.renderChecklistPagePlus();
+    return;
+  }
+
   container.innerHTML = '<div class="empty-box">Ładowanie checklist...</div>';
   const items = await loadChecklistFromSupabase();
   renderChecklistSummary(items);
@@ -714,10 +752,15 @@ function validateSpotPayload(raw) {
   const depth_m = parseNumber(raw.depth_m, { min: 0, max: 100, allowNull: true });
   const bottom_type = normalizeText(raw.bottom_type, 60);
   const note = normalizeText(raw.note, 500);
+  const obstacles = normalizeText(raw.obstacles, 120);
+  const best_time = normalizeText(raw.best_time, 60);
+  const best_wind = normalizeText(raw.best_wind, 60);
+  const image_url = normalizeText(raw.image_url, 300);
 
   if (!name) return { ok: false, message: "Podaj nazwę spotu." };
   if (Number.isNaN(distance_m)) return { ok: false, message: "Odległość musi być liczbą 0 lub większą." };
   if (Number.isNaN(depth_m)) return { ok: false, message: "Głębokość musi być liczbą 0 lub większą." };
+  if (image_url && !/^https?:\/\//i.test(image_url)) return { ok: false, message: "Link do szkicu musi zaczynać się od http:// lub https://" };
 
   return {
     ok: true,
@@ -726,7 +769,11 @@ function validateSpotPayload(raw) {
       distance_m,
       depth_m,
       bottom_type: bottom_type || null,
-      note: note || null
+      note: note || null,
+      obstacles: obstacles || null,
+      best_time: best_time || null,
+      best_wind: best_wind || null,
+      image_url: image_url || null
     }
   };
 }
@@ -738,6 +785,10 @@ function fillSpotFormForEdit(item) {
   $("spot-depth").value = item.depth_m ?? "";
   $("spot-bottom").value = item.bottom_type || "";
   $("spot-note").value = item.note || "";
+  if ($("spot-obstacles")) $("spot-obstacles").value = item.obstacles || "";
+  if ($("spot-best-time")) $("spot-best-time").value = item.best_time || "";
+  if ($("spot-best-wind")) $("spot-best-wind").value = item.best_wind || "";
+  if ($("spot-image-url")) $("spot-image-url").value = item.image_url || "";
   $("spot-form-title").textContent = "Edytuj spot";
   $("save-spot-btn").textContent = "Zapisz zmiany";
   $("cancel-edit-spot-btn").classList.remove("hidden");
@@ -762,7 +813,11 @@ async function handleSpotSubmit(event) {
     distance_m: $("spot-distance")?.value,
     depth_m: $("spot-depth")?.value,
     bottom_type: $("spot-bottom")?.value,
-    note: $("spot-note")?.value
+    note: $("spot-note")?.value,
+    obstacles: $("spot-obstacles")?.value,
+    best_time: $("spot-best-time")?.value,
+    best_wind: $("spot-best-wind")?.value,
+    image_url: $("spot-image-url")?.value
   });
 
   if (!validation.ok) {
@@ -795,15 +850,32 @@ async function handleSpotSubmit(event) {
 
 async function deleteSpot(id) {
   if (!supabaseClient) return;
+
+  const spots = await loadSpotsFromSupabase();
+  const spot = spots.find(item => Number(item.id) === Number(id));
+  const spotName = normalizeText(spot?.name || "", 80);
+
   if (!window.confirm("Usunąć ten spot?")) return;
+
+  const { error: catchesError } = await supabaseClient
+    .from("catches")
+    .update({ spot: spotName || "Usunięty spot", spot_id: null })
+    .eq("spot_id", Number(id));
+
+  if (catchesError) {
+    console.error("Błąd odpinania połowów od spotu:", catchesError.message);
+    window.alert("Nie udało się bezpiecznie odpiąć połowów od tego spotu.");
+    return;
+  }
+
   const { error } = await supabaseClient.from("spots").delete().eq("id", id);
   if (error) {
     window.alert("Nie udało się usunąć spotu.");
     return;
   }
   await renderSpotsPage();
-  const spots = await loadSpotsFromSupabase();
-  populateSpotSelect(spots);
+  const refreshedSpots = await loadSpotsFromSupabase();
+  populateSpotSelect(refreshedSpots);
 }
 
 async function editSpot(id) {
@@ -855,9 +927,29 @@ function renderSpotsList(spots) {
     badges.appendChild(el("span", "badge", `Dno: ${normalizeText(item.bottom_type || "brak", 60)}`));
 
     article.append(top, badges);
+
+    const meta = [];
+    if (item.obstacles) meta.push(`Zaczepy: ${normalizeText(item.obstacles, 120)}`);
+    if (item.best_time) meta.push(`Najlepsza pora: ${normalizeText(item.best_time, 60)}`);
+    if (item.best_wind) meta.push(`Najlepszy wiatr: ${normalizeText(item.best_wind, 60)}`);
+    if (meta.length) {
+      article.appendChild(el("div", "catch-note", meta.join(" • ")));
+    }
+
     if (item.note) {
       article.appendChild(el("div", "catch-note", normalizeText(item.note, 500)));
     }
+
+    if (item.image_url) {
+      const preview = el("div", "spot-preview");
+      const img = document.createElement("img");
+      img.src = item.image_url;
+      img.alt = `Szkic / obraz spotu ${item.name}`;
+      img.loading = "lazy";
+      preview.appendChild(img);
+      article.appendChild(preview);
+    }
+
     list.appendChild(article);
   });
 }
@@ -865,6 +957,12 @@ function renderSpotsList(spots) {
 async function renderSpotsPage() {
   const list = $("spots-list");
   if (!list) return;
+
+  if (typeof window.renderSpotsPagePlus === "function") {
+    await window.renderSpotsPagePlus();
+    return;
+  }
+
   list.innerHTML = '<div class="empty-box">Ładowanie spotów...</div>';
   const spots = await loadSpotsFromSupabase();
   renderSpotsSummary(spots);
@@ -1312,6 +1410,10 @@ function updateDashboard(catches, spots = [], checklist = []) {
   }
 
   const ctx = document.getElementById("fishChart");
+  if (typeof window.renderDashboardExtras === "function") {
+    window.renderDashboardExtras();
+  }
+
   if (ctx && window.Chart) {
     const labels = ["Patryk", "Maciek"];
     const values = labels.map(name =>

@@ -3,6 +3,9 @@
 
   function getSupabaseClientSafe() {
     try {
+      if (typeof window !== "undefined" && window.supabaseClient) return window.supabaseClient;
+    } catch (_) {}
+    try {
       if (typeof supabaseClient !== "undefined" && supabaseClient) return supabaseClient;
     } catch (_) {}
     return null;
@@ -909,7 +912,6 @@
 
   function init() {
     enhanceNavigationIcons();
-    bindChecklistFix();
     bindRefreshButton();
 
     if ($("weather-current-temp")) {

@@ -146,28 +146,53 @@ function playPbCelebrationSound() {
     if (!AudioCtx) return;
 
     const ctx = new AudioCtx();
-    const startAt = ctx.currentTime + 0.02;
-    const notes = [523.25, 659.25, 783.99, 1046.5];
+    const startAt = ctx.currentTime + 0.03;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, startAt);
+    master.gain.exponentialRampToValueAtTime(0.22, startAt + 0.04);
+    master.gain.exponentialRampToValueAtTime(0.0001, startAt + 1.75);
+    master.connect(ctx.destination);
 
-    notes.forEach((freq, index) => {
-      const oscillator = ctx.createOscillator();
+    const scheduleVoice = (freq, when, duration, type = "triangle", volume = 0.08, detune = 0) => {
+      const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(freq, startAt + index * 0.11);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, when);
+      if (detune) osc.detune.setValueAtTime(detune, when);
 
-      gain.gain.setValueAtTime(0.0001, startAt + index * 0.11);
-      gain.gain.exponentialRampToValueAtTime(0.07, startAt + index * 0.11 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + index * 0.11 + 0.22);
+      gain.gain.setValueAtTime(0.0001, when);
+      gain.gain.exponentialRampToValueAtTime(volume, when + 0.02);
+      gain.gain.exponentialRampToValueAtTime(Math.max(volume * 0.55, 0.02), when + Math.max(duration - 0.12, 0.05));
+      gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
 
-      oscillator.connect(gain);
-      gain.connect(ctx.destination);
-      oscillator.start(startAt + index * 0.11);
-      oscillator.stop(startAt + index * 0.11 + 0.24);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(when);
+      osc.stop(when + duration + 0.02);
+    };
+
+    const hits = [
+      { notes: [523.25, 659.25], when: startAt, duration: 0.22 },
+      { notes: [659.25, 783.99], when: startAt + 0.18, duration: 0.24 },
+      { notes: [783.99, 987.77], when: startAt + 0.37, duration: 0.28 },
+      { notes: [1046.5, 1318.51], when: startAt + 0.62, duration: 0.72 }
+    ];
+
+    hits.forEach(({ notes, when, duration }, idx) => {
+      notes.forEach((freq, noteIdx) => {
+        scheduleVoice(freq, when, duration, noteIdx === 0 ? "triangle" : "sine", noteIdx === 0 ? 0.09 : 0.05, noteIdx === 0 ? -4 : 4);
+      });
+      if (idx < 3) {
+        scheduleVoice(notes[0] / 2, when, Math.min(duration * 0.9, 0.24), "sine", 0.035, 0);
+      }
     });
+
+    scheduleVoice(783.99, startAt + 1.02, 0.55, "triangle", 0.06, -3);
+    scheduleVoice(1046.5, startAt + 1.02, 0.62, "sine", 0.045, 3);
 
     window.setTimeout(() => {
       try { ctx.close(); } catch (_) {}
-    }, 900);
+    }, 2100);
   } catch (_) {}
 }
 
@@ -1459,11 +1484,16 @@ function updateDashboard(catches, spots = [], checklist = []) {
   $("total-weight").textContent = `${globalStats.totalWeight.toFixed(1)} kg`;
   $("total-fish").textContent = String(globalStats.totalFish);
   $("biggest-fish").textContent = globalStats.biggestFish;
+  const biggestFishItem = catches.reduce((best, item) => {
+    if (!best) return item;
+    return Number(item.weight || 0) > Number(best.weight || 0) ? item : best;
+  }, null);
+  const biggestFishPerson = biggestFishItem ? normalizeText(biggestFishItem.person, 40) : "Brak";
+  if ($("biggest-fish-person")) $("biggest-fish-person").textContent = biggestFishPerson;
   $("best-spot").textContent = globalStats.bestSpot;
   $("best-bait-global").textContent = globalStats.bestBait;
   $("best-hour-global").textContent = globalStats.bestHour;
   $("spots-count-dashboard").textContent = String(spots.length);
-  $("checklist-done-dashboard").textContent = String(checklist.filter(item => item.done).length);
 
   $("patryk-biggest").textContent = `${patrykStats.biggest.toFixed(1)} kg`;
   $("patryk-total").textContent = `${patrykStats.total.toFixed(1)} kg`;

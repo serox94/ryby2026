@@ -336,8 +336,8 @@
       applyStatus($("total-weight")?.closest(".stat-card"), catches.length ? "success" : "info");
       applyStatus($("total-fish")?.closest(".stat-card"), catches.length ? "success" : "warn");
       applyStatus($("biggest-fish")?.closest(".stat-card"), catches.length ? "success" : "info");
+      applyStatus($("biggest-fish-person")?.closest(".stat-card"), catches.length ? "success" : "info");
       applyStatus($("best-spot")?.closest(".stat-card"), bestSpot !== "Brak danych" ? "info" : "warn");
-      applyStatus($("checklist-done-dashboard")?.closest(".stat-card"), getOpenItemsStatus(openChecklist));
       applyStatus($("spots-count-dashboard")?.closest(".stat-card"), spots.length ? "success" : "warn");
 
       let bestBiteWindow = "Brak danych";

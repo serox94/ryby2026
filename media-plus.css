@@ -66,25 +66,24 @@
 
 .chart-wrap {
   position: relative;
+  width: 100%;
   min-height: 340px;
+  height: 340px;
 }
 
-.chart-wrap canvas {
+.chart-wrap canvas,
+#fishChart {
+  display: block;
   width: 100% !important;
   height: 340px !important;
+  max-width: 100%;
 }
 
-.chart-empty {
-  min-height: 220px;
-  display: grid;
-  place-items: center;
-  border: 1px dashed rgba(255,255,255,0.12);
-  border-radius: 14px;
-  color: var(--muted);
-  background: rgba(15, 20, 30, 0.72);
+.menu-toggle {
+  display: none;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 900px) {
   .hero-split {
     grid-template-columns: 1fr;
   }
@@ -97,11 +96,49 @@
     height: 240px;
   }
 
-  .chart-wrap {
-    min-height: 300px;
+  .mobile-nav-wrap {
+    display: block;
+    position: relative;
+    z-index: 1000;
   }
 
-  .chart-wrap canvas {
-    height: 300px !important;
+  .menu-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1002;
+  }
+
+  .main-nav {
+    display: none !important;
+    position: relative;
+    z-index: 1001;
+    gap: 8px;
+    padding: 0 0 14px;
+    overflow: visible;
+  }
+
+  .main-nav.open {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .main-nav a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .chart-wrap {
+    min-height: 280px;
+    height: 280px;
+  }
+
+  .chart-wrap canvas,
+  #fishChart {
+    height: 280px !important;
   }
 }

@@ -152,51 +152,17 @@ function setupMobileMenu() {
 
   toggleBtn.dataset.bound = "1";
 
-  function closeMenu() {
-    nav.classList.remove("open");
-    toggleBtn.setAttribute("aria-expanded", "false");
-  }
-
-  function openMenu() {
-    nav.classList.add("open");
-    toggleBtn.setAttribute("aria-expanded", "true");
-  }
-
-  toggleBtn.addEventListener("click", function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (nav.classList.contains("open")) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
+  toggleBtn.addEventListener("click", () => {
+    nav.classList.toggle("open");
+    const expanded = nav.classList.contains("open");
+    toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
   });
 
-  nav.querySelectorAll("a").forEach(function (link) {
-    link.addEventListener("click", function () {
-      closeMenu();
-    });
-  });
-
-  document.addEventListener("click", function (event) {
-    if (!nav.contains(event.target) && !toggleBtn.contains(event.target)) {
-      closeMenu();
-    }
-  });
-
-  window.addEventListener("resize", function () {
-    if (window.innerWidth > 900) {
-      closeMenu();
-    }
-  });
-}
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) {
+  nav.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
       nav.classList.remove("open");
       toggleBtn.setAttribute("aria-expanded", "false");
-    }
+    });
   });
 }
 
@@ -1345,93 +1311,39 @@ function updateDashboard(catches, spots = [], checklist = []) {
     }
   }
 
-const chartCanvas = document.getElementById("fishChart");
-if (chartCanvas && window.Chart) {
-  const chartCtx = chartCanvas.getContext("2d");
-  if (chartCtx) {
+  const ctx = document.getElementById("fishChart");
+  if (ctx && window.Chart) {
     const labels = ["Patryk", "Maciek"];
-    const weightValues = labels.map(name =>
+    const values = labels.map(name =>
       catches
         .filter(item => item.person === name)
         .reduce((sum, item) => sum + Number(item.weight || 0), 0)
     );
 
-    const countValues = labels.map(name =>
-      catches.filter(item => item.person === name).length
-    );
+    if (chartInstance) chartInstance.destroy();
 
-    if (chartInstance) {
-      chartInstance.destroy();
-      chartInstance = null;
-    }
-
-    chartInstance = new window.Chart(chartCtx, {
+    chartInstance = new window.Chart(ctx, {
       type: "bar",
       data: {
         labels,
-        datasets: [
-          {
-            label: "Łączna waga ryb (kg)",
-            data: weightValues,
-            backgroundColor: ["rgba(73,166,255,0.72)", "rgba(61,220,151,0.72)"],
-            borderColor: ["rgba(73,166,255,1)", "rgba(61,220,151,1)"],
-            borderWidth: 1,
-            borderRadius: 10,
-            yAxisID: "y"
-          },
-          {
-            type: "line",
-            label: "Liczba ryb",
-            data: countValues,
-            borderColor: "rgba(255,215,120,1)",
-            backgroundColor: "rgba(255,215,120,0.18)",
-            tension: 0.25,
-            fill: false,
-            pointRadius: 5,
-            pointHoverRadius: 6,
-            yAxisID: "y1"
-          }
-        ]
+        datasets: [{
+          label: "Łączna waga ryb (kg)",
+          data: values,
+          backgroundColor: ["rgba(73,166,255,0.7)", "rgba(61,220,151,0.7)"],
+          borderRadius: 8
+        }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        resizeDelay: 150,
         plugins: {
-          legend: {
-            labels: {
-              color: "#dfe7f2"
-            }
-          }
+          legend: { display: false }
         },
         scales: {
           y: {
             beginAtZero: true,
             ticks: {
-              color: "#aeb9c9",
               callback: value => `${value} kg`
-            },
-            grid: {
-              color: "rgba(255,255,255,0.06)"
-            }
-          },
-          y1: {
-            beginAtZero: true,
-            position: "right",
-            ticks: {
-              precision: 0,
-              color: "#aeb9c9"
-            },
-            grid: {
-              drawOnChartArea: false
-            }
-          },
-          x: {
-            ticks: {
-              color: "#aeb9c9"
-            },
-            grid: {
-              color: "rgba(255,255,255,0.04)"
             }
           }
         }

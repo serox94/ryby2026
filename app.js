@@ -755,12 +755,10 @@ function validateSpotPayload(raw) {
   const obstacles = normalizeText(raw.obstacles, 120);
   const best_time = normalizeText(raw.best_time, 60);
   const best_wind = normalizeText(raw.best_wind, 60);
-  const image_url = normalizeText(raw.image_url, 300);
 
   if (!name) return { ok: false, message: "Podaj nazwę spotu." };
   if (Number.isNaN(distance_m)) return { ok: false, message: "Odległość musi być liczbą 0 lub większą." };
   if (Number.isNaN(depth_m)) return { ok: false, message: "Głębokość musi być liczbą 0 lub większą." };
-  if (image_url && !/^https?:\/\//i.test(image_url)) return { ok: false, message: "Link do szkicu musi zaczynać się od http:// lub https://" };
 
   return {
     ok: true,
@@ -772,8 +770,7 @@ function validateSpotPayload(raw) {
       note: note || null,
       obstacles: obstacles || null,
       best_time: best_time || null,
-      best_wind: best_wind || null,
-      image_url: image_url || null
+      best_wind: best_wind || null
     }
   };
 }
@@ -788,7 +785,6 @@ function fillSpotFormForEdit(item) {
   if ($("spot-obstacles")) $("spot-obstacles").value = item.obstacles || "";
   if ($("spot-best-time")) $("spot-best-time").value = item.best_time || "";
   if ($("spot-best-wind")) $("spot-best-wind").value = item.best_wind || "";
-  if ($("spot-image-url")) $("spot-image-url").value = item.image_url || "";
   $("spot-form-title").textContent = "Edytuj spot";
   $("save-spot-btn").textContent = "Zapisz zmiany";
   $("cancel-edit-spot-btn").classList.remove("hidden");
@@ -816,8 +812,7 @@ async function handleSpotSubmit(event) {
     note: $("spot-note")?.value,
     obstacles: $("spot-obstacles")?.value,
     best_time: $("spot-best-time")?.value,
-    best_wind: $("spot-best-wind")?.value,
-    image_url: $("spot-image-url")?.value
+    best_wind: $("spot-best-wind")?.value
   });
 
   if (!validation.ok) {
@@ -938,16 +933,6 @@ function renderSpotsList(spots) {
 
     if (item.note) {
       article.appendChild(el("div", "catch-note", normalizeText(item.note, 500)));
-    }
-
-    if (item.image_url) {
-      const preview = el("div", "spot-preview");
-      const img = document.createElement("img");
-      img.src = item.image_url;
-      img.alt = `Szkic / obraz spotu ${item.name}`;
-      img.loading = "lazy";
-      preview.appendChild(img);
-      article.appendChild(preview);
     }
 
     list.appendChild(article);
@@ -1536,7 +1521,15 @@ function initApp() {
   if (document.querySelector(".knowledge-grid")) initKnowledgePage();
 }
 
-document.addEventListener("DOMContentLoaded", initApp);
+function bootApp() {
+  if (window.RybyAuth && !window.RybyAuth.isAuthenticated()) {
+    document.addEventListener("ryby:auth-success", initApp, { once: true });
+    return;
+  }
+  initApp();
+}
+
+document.addEventListener("DOMContentLoaded", bootApp);
 
 window.deleteCatch = deleteCatch;
 window.editCatch = editCatch;

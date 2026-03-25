@@ -115,6 +115,30 @@
     return "danger";
   }
 
+  function getWindStrengthLabel(speed) {
+    const value = Number(speed || 0);
+    if (value < 5) return "bardzo słaby";
+    if (value < 12) return "słaby";
+    if (value < 20) return "umiarkowany";
+    if (value < 28) return "odczuwalny";
+    if (value < 38) return "mocny";
+    if (value < 50) return "bardzo mocny";
+    return "bardzo silny";
+  }
+
+  function getWindGustLabel(gusts) {
+    const value = Number(gusts || 0);
+    if (value < 20) return "mało porywisty";
+    if (value < 30) return "lekko porywisty";
+    if (value < 40) return "porywisty";
+    if (value < 50) return "mocno porywisty";
+    return "bardzo porywisty";
+  }
+
+  function describeWind(speed, gusts) {
+    return `${getWindStrengthLabel(speed)}, ${getWindGustLabel(gusts)}`;
+  }
+
   function parseNum(value, allowNull = true) {
     if (value === "" || value === null || value === undefined) return allowNull ? null : NaN;
     const n = Number(value);
@@ -150,7 +174,7 @@
       latitude: String(spot.latitude),
       longitude: String(spot.longitude),
       hourly: "temperature_2m,pressure_msl,wind_speed_10m,wind_gusts_10m,cloud_cover,precipitation",
-      daily: "wind_speed_10m_max,precipitation_sum",
+      daily: "wind_speed_10m_max,wind_gusts_10m_max,precipitation_sum",
       timezone: "auto",
       forecast_days: "3"
     });
@@ -359,11 +383,12 @@
         bestBiteWindow = `${bestHourStart}–${bestHourEnd} (${biteScoreLabel(bestScore)})`;
 
         const tomorrowWindValue = Number(weather.daily.wind_speed_10m_max?.[1] || 0);
-        tomorrowWind = `${tomorrowWindValue.toFixed(1)} km/h`;
-        if (tomorrowWindValue >= 28) {
-          dashboardWarning = `Uwaga: jutro mocny wiatr (${tomorrowWind}).`;
-        } else if (tomorrowWindValue >= 20) {
-          dashboardWarning = `Jutro wiatr będzie odczuwalny (${tomorrowWind}).`;
+        const tomorrowGustsValue = Number(weather.daily.wind_gusts_10m_max?.[1] || 0);
+        tomorrowWind = `${tomorrowWindValue.toFixed(1)} km/h • ${describeWind(tomorrowWindValue, tomorrowGustsValue)}`;
+        if (tomorrowWindValue >= 28 || tomorrowGustsValue >= 40) {
+          dashboardWarning = `Uwaga: jutro wiatr będzie mocny i wyraźnie porywisty.`;
+        } else if (tomorrowWindValue >= 20 || tomorrowGustsValue >= 30) {
+          dashboardWarning = `Jutro wiatr będzie odczuwalny, ustaw stanowisko z głową.`;
         } else if (openChecklist > 0) {
           dashboardWarning = `Brakuje jeszcze ${openChecklist} rzeczy z checklist.`;
         }
@@ -378,17 +403,23 @@
         {
           title: "🌬️ Jutro wiatr",
           value: tomorrowWind,
-          status: tomorrowWind !== "Brak danych" && Number.parseFloat(tomorrowWind) >= 28 ? "danger" : "info"
+          status: tomorrowWind === "Brak danych"
+            ? "info"
+            : tomorrowWind.includes("bardzo mocny") || tomorrowWind.includes("bardzo porywisty") || tomorrowWind.includes("mocny, mocno porywisty")
+              ? "danger"
+              : tomorrowWind.includes("odczuwalny") || tomorrowWind.includes("porywisty")
+                ? "warn"
+                : "info"
         },
         {
-          title: "✅ Checklisty",
-          value: openChecklist > 0 ? `${openChecklist} rzeczy do ogarnięcia` : "Wszystko gotowe",
+          title: "📦 Do spakowania",
+          value: openChecklist > 0 ? `${openChecklist} rzeczy` : "Nic nie brakuje",
           status: openChecklist > 0 ? "warn" : "success"
         },
         {
-          title: "📍 Najskuteczniejszy spot",
-          value: bestSpot,
-          status: bestSpot !== "Brak danych" ? "info" : "warn"
+          title: "✅ Spakowane",
+          value: `${checklistItems.filter((item) => item.done).length} rzeczy`,
+          status: checklistItems.filter((item) => item.done).length > 0 ? "success" : "info"
         }
       ]);
     } catch (error) {
@@ -724,7 +755,7 @@
 
         <div class="spot-map-hint">
           Nie znalazłem publicznej mapy batymetrycznej tego łowiska. Najlepszy ruch: zapisuj własne głębokości,
-          rodzaj dna, zaczepy i wklejaj tutaj link do własnego screena z echosondy albo Deepera przy konkretnym spocie.
+          rodzaj dna, zaczepy, najlepszy czas i krótki opis tego, czego spodziewać się na danym miejscu.
         </div>
       </article>
     `;
@@ -740,7 +771,6 @@
     const obstacles = normalizeTextSafe(raw.obstacles, 120);
     const best_time = normalizeTextSafe(raw.best_time, 60);
     const best_wind = normalizeTextSafe(raw.best_wind, 60);
-    const image_url = normalizeTextSafe(raw.image_url, 300);
 
     if (!name) return { ok: false, message: "Podaj nazwę spotu." };
     if (Number.isNaN(distance_m)) return { ok: false, message: "Odległość musi być liczbą 0 lub większą." };
@@ -756,8 +786,7 @@
         note: note || null,
         obstacles: obstacles || null,
         best_time: best_time || null,
-        best_wind: best_wind || null,
-        image_url: image_url || null
+        best_wind: best_wind || null
       }
     };
   }
@@ -772,7 +801,6 @@
     if ($("spot-obstacles")) $("spot-obstacles").value = item.obstacles || "";
     if ($("spot-best-time")) $("spot-best-time").value = item.best_time || "";
     if ($("spot-best-wind")) $("spot-best-wind").value = item.best_wind || "";
-    if ($("spot-image-url")) $("spot-image-url").value = item.image_url || "";
     if ($("spot-form-title")) $("spot-form-title").textContent = "Edytuj spot";
     if ($("save-spot-btn")) $("save-spot-btn").textContent = "Zapisz zmiany";
     if ($("cancel-edit-spot-btn")) $("cancel-edit-spot-btn").classList.remove("hidden");
@@ -800,8 +828,7 @@
       note: $("spot-note")?.value,
       obstacles: $("spot-obstacles")?.value,
       best_time: $("spot-best-time")?.value,
-      best_wind: $("spot-best-wind")?.value,
-      image_url: $("spot-image-url")?.value
+      best_wind: $("spot-best-wind")?.value
     });
 
     if (!validation.ok) {
@@ -962,15 +989,6 @@
         article.appendChild(createNode("div", "catch-note", normalizeTextSafe(item.note, 500)));
       }
 
-      if (item.image_url) {
-        const preview = createNode("div", "spot-preview");
-        const img = document.createElement("img");
-        img.src = item.image_url;
-        img.alt = `Szkic / obraz spotu ${item.name}`;
-        preview.appendChild(img);
-        article.appendChild(preview);
-      }
-
       list.appendChild(article);
     });
   }
@@ -1094,9 +1112,17 @@
   window.renderChecklistPagePlus = renderChecklistPagePlus;
   window.renderSpotsPagePlus = renderSpotsPagePlus;
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initPlus);
-  } else {
+  function bootPlus() {
+    if (window.RybyAuth && !window.RybyAuth.isAuthenticated()) {
+      document.addEventListener("ryby:auth-success", initPlus, { once: true });
+      return;
+    }
     initPlus();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootPlus);
+  } else {
+    bootPlus();
   }
 })();

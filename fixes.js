@@ -113,6 +113,30 @@
     return `${dirs[index]} (${Math.round(value)}°)`;
   }
 
+  function getWindStrengthLabel(speed) {
+    const value = Number(speed || 0);
+    if (value < 5) return "bardzo słaby";
+    if (value < 12) return "słaby";
+    if (value < 20) return "umiarkowany";
+    if (value < 28) return "odczuwalny";
+    if (value < 38) return "mocny";
+    if (value < 50) return "bardzo mocny";
+    return "bardzo silny";
+  }
+
+  function getWindGustLabel(gusts) {
+    const value = Number(gusts || 0);
+    if (value < 20) return "mało porywisty";
+    if (value < 30) return "lekko porywisty";
+    if (value < 40) return "porywisty";
+    if (value < 50) return "mocno porywisty";
+    return "bardzo porywisty";
+  }
+
+  function describeWind(speed, gusts) {
+    return `${getWindStrengthLabel(speed)}, ${getWindGustLabel(gusts)}`;
+  }
+
   function moonPhaseInfo(date = new Date()) {
     const lp = 2551443;
     const newMoon = new Date("2001-01-24T13:00:00Z").getTime();
@@ -570,6 +594,7 @@
     const description = weatherCodeToText(current.weather_code);
     const icon = weatherCodeToIcon(current.weather_code);
     const windDirection = windDirectionToText(current.wind_direction_10m);
+    const windSummary = describeWind(current.wind_speed_10m, current.wind_gusts_10m);
     const spot = getFishingSpotSafe();
     const moon = moonPhaseInfo(new Date());
     const night = pickNearestNightWindow(hourly, currentIndex);
@@ -596,8 +621,8 @@
     if ($("weather-rating-note")) $("weather-rating-note").textContent = `Warunki: ${rating}`;
 
     if ($("weather-apparent-temp")) $("weather-apparent-temp").textContent = `${Number(current.apparent_temperature).toFixed(1)}°C`;
-    if ($("weather-wind-direction")) $("weather-wind-direction").textContent = windDirection;
-    if ($("weather-wind-direction-copy")) $("weather-wind-direction-copy").textContent = windDirection;
+    if ($("weather-wind-direction")) $("weather-wind-direction").textContent = `${windDirection} • ${windSummary}`;
+    if ($("weather-wind-direction-copy")) $("weather-wind-direction-copy").textContent = `${windDirection} • ${windSummary}`;
     if ($("weather-cloud-cover")) $("weather-cloud-cover").textContent = `${Math.round(Number(current.cloud_cover || 0))}%`;
     if ($("weather-precipitation")) $("weather-precipitation").textContent = `${Number(current.precipitation || 0).toFixed(1)} mm`;
     if ($("weather-humidity")) $("weather-humidity").textContent = `${Math.round(Number(current.relative_humidity_2m || 0))}%`;
@@ -622,9 +647,9 @@
       $("wind-arrow").style.transform = `translate(-50%, -86%) rotate(${Number(current.wind_direction_10m || 0)}deg)`;
     }
     if ($("wind-compass-text")) $("wind-compass-text").textContent = windDirection;
-    if ($("wind-direction-long")) $("wind-direction-long").textContent = windDirection;
-    if ($("wind-gusts-inline")) $("wind-gusts-inline").textContent = `${Number(current.wind_gusts_10m || 0).toFixed(1)} km/h`;
-    if ($("wind-score-inline")) $("wind-score-inline").textContent = rating;
+    if ($("wind-direction-long")) $("wind-direction-long").textContent = `${windDirection} • ${getWindStrengthLabel(current.wind_speed_10m)}`;
+    if ($("wind-gusts-inline")) $("wind-gusts-inline").textContent = `${Number(current.wind_gusts_10m || 0).toFixed(1)} km/h • ${getWindGustLabel(current.wind_gusts_10m)}`;
+    if ($("wind-score-inline")) $("wind-score-inline").textContent = windSummary;
 
     if ($("bite-chance-main")) $("bite-chance-main").textContent = biteAnalysis.label;
     if ($("bite-score-note")) $("bite-score-note").textContent = `Punktacja: ${biteAnalysis.score}`;
@@ -919,9 +944,17 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
+  function bootFixes() {
+    if (window.RybyAuth && !window.RybyAuth.isAuthenticated()) {
+      document.addEventListener("ryby:auth-success", init, { once: true });
+      return;
+    }
     init();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootFixes);
+  } else {
+    bootFixes();
   }
 })();

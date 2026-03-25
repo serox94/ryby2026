@@ -83,6 +83,7 @@
   display: none;
 }
 
+/* KLUCZOWA NAPRAWA MENU */
 @media (max-width: 900px) {
   .hero-split {
     grid-template-columns: 1fr;
@@ -99,36 +100,38 @@
   .mobile-nav-wrap {
     display: block;
     position: relative;
-    z-index: 1000;
+    z-index: 5000;
   }
 
   .menu-toggle {
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 44px;
+    min-height: 46px;
     margin-bottom: 12px;
     position: relative;
-    z-index: 1002;
+    z-index: 5002;
   }
 
   .main-nav {
     display: none !important;
-    position: relative;
-    z-index: 1001;
-    gap: 8px;
-    padding: 0 0 14px;
-    overflow: visible;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+    position: relative !important;
+    z-index: 5001;
+    padding-bottom: 14px;
   }
 
   .main-nav.open {
     display: flex !important;
-    flex-direction: column;
   }
 
   .main-nav a {
-    width: 100%;
+    display: flex !important;
+    width: 100% !important;
+    justify-content: center;
     text-align: center;
   }
 

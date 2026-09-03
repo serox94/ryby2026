@@ -1,0 +1,73 @@
+{
+  "app": {
+    "name": "Dream Team",
+    "tagline": "Carp Fishing Trip Manager",
+    "activeTripId": "next-trip"
+  },
+  "anglers": [
+    { "id": "patryk", "name": "Patryk", "pbKg": 13 },
+    { "id": "maciek", "name": "Maciek", "pbKg": 13 }
+  ],
+  "trips": [
+    {
+      "id": "next-trip",
+      "year": 2026,
+      "name": "Następny wyjazd",
+      "lake": "Łowisko do ustawienia",
+      "country": "—",
+      "status": "planning",
+      "start": null,
+      "end": null,
+      "peg": "—",
+      "coordinates": null,
+      "heroImage": "../assets/img/patryk-maciek.jpeg",
+      "lakeImage": "../assets/img/lowisko.jpg",
+      "facts": {
+        "waterSize": "—",
+        "depth": "—",
+        "carpRecord": "—",
+        "rods": "—",
+        "baitBoat": "—",
+        "power": "—"
+      },
+      "stats": {
+        "fishCount": 0,
+        "totalWeightKg": 0,
+        "biggestFishKg": 0,
+        "biggestFishAngler": null,
+        "bestSpot": null,
+        "bestBait": null
+      }
+    },
+    {
+      "id": "la-plaine-2026",
+      "year": 2026,
+      "name": "Ryby 2026",
+      "lake": "LodgingCarp – La Plaine des Bois 2",
+      "country": "Francja",
+      "status": "archived",
+      "start": "2026-06-20T14:00:00+02:00",
+      "end": "2026-06-27T10:00:00+02:00",
+      "peg": "Plaine 2",
+      "coordinates": null,
+      "heroImage": "../assets/img/patryk-maciek.jpeg",
+      "lakeImage": "../assets/img/lowisko.jpg",
+      "facts": {
+        "waterSize": "dane z wyjazdu 2026",
+        "depth": "dane z wyjazdu 2026",
+        "carpRecord": "dane z wyjazdu 2026",
+        "rods": "wg regulaminu wyjazdu",
+        "baitBoat": "wg regulaminu wyjazdu",
+        "power": "dostępny wg danych wyjazdu"
+      },
+      "stats": {
+        "fishCount": 0,
+        "totalWeightKg": 0,
+        "biggestFishKg": 0,
+        "biggestFishAngler": null,
+        "bestSpot": null,
+        "bestBait": null
+      }
+    }
+  ]
+}
